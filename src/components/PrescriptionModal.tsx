@@ -7,8 +7,9 @@ import { X } from "lucide-react";
 interface Prescription {
   medication: string;
   dosage: string;
+  frequency: string;
   instructions: string;
-  createdAt: string;
+  prescribedDate: string;
 }
 
 interface PrescriptionModalProps {
@@ -36,6 +37,7 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({ prescriptions, on
             <tr>
               <th>Medication</th>
               <th>Dosage</th>
+              <th>Frequency</th>
               <th>Instructions</th>
               <th>Date</th>
             </tr>
@@ -46,8 +48,9 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({ prescriptions, on
                 <tr key={index}>
                   <td>{p.medication}</td>
                   <td>{p.dosage}</td>
+                  <td>{p.frequency}</td>
                   <td>{p.instructions}</td>
-                  <td>{new Date(p.createdAt).toLocaleDateString()}</td>
+                  <td>{new Date(p.prescribedDate).toLocaleDateString()}</td>
                 </tr>
               ))
             ) : (

@@ -25,7 +25,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => 
       <div className="profile-modal">
         {/* ✅ Header with icons */}
         <div className="profile-modal-header">
-          <span>Patient Profile</span>
+          <span>User Profile</span>
           <div className="modal-header-icons">
             <Pencil className="edit-button" />
             <X className="close-button" onClick={onClose} />

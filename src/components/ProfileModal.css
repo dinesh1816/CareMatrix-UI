@@ -53,7 +53,17 @@
   
   /* ✅ Close & Edit Button */
 /* ✅ Ensure the buttons have no border or background */
-.close-button,
+.close-button {
+  all: unset; /* Reset inherited styles */
+    color: #9ca3af; /* Light gray */
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    transition: color 0.2s ease-in-out; 
+}
 .edit-button {
     all: unset; /* Reset inherited styles */
     color: #9ca3af; /* Light gray */

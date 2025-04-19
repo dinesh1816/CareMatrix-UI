@@ -1,0 +1,27 @@
+.add-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+
+.add-modal-container { background: #fff; border-radius: 12px; padding: 32px; width: 500px; max-width: 95%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); position: relative; font-family: "Inter", sans-serif; }
+
+.add-modal-container h2 { font-size: 1.6rem; margin-bottom: 1.5rem; font-weight: 700; color: #0f172a; }
+
+.close-button { position: absolute; top: 16px; right: 16px; font-size: 1.5rem; background: none; border: none; color: #64748b; cursor: pointer; }
+
+.form-grid { display: flex; flex-direction: column; gap: 1rem; }
+
+.form-grid label { font-size: 0.95rem; font-weight: 500; color: #0f172a; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.form-grid input, .form-grid select, .form-grid textarea { padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background-color: #f9fafb; transition: border-color 0.2s ease; }
+
+.form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus { outline: none; border-color: #3b82f6; background-color: #fff; }
+
+textarea { resize: vertical; min-height: 80px; }
+
+.form-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+
+.cancel-button { background-color: #f1f5f9; border: none; color: #334155; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+
+.cancel-button:hover { background-color: #e2e8f0; }
+
+.submit-button { background-color: #64748b; border: none; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+
+.submit-button:hover { background-color: #475569; }

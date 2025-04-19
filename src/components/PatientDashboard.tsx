@@ -11,7 +11,8 @@ import InsuranceModal from "./InsuranceModal";
 import PrescriptionModal from "./PrescriptionModal";
 import SurgeryModal from "./SurgeryModal";
 import AppointmentsModal from "./AppointmentsModal";
-import { UserCircle2, LogOut, Calendar, Video } from "lucide-react";
+import AddInsuranceModal from "./AddInsuranceModal";
+import { UserCircle2, LogOut, Calendar, Video, Plus } from "lucide-react";
 
 const patientId = 2;
 const baseURL = process.env.REACT_APP_API_BASE_URL;
@@ -32,18 +33,22 @@ type Allergy = {
 type Condition = {
   conditionName: string;
   createdAt: string;
+  status: string;
 };
 
 type Prescription = {
   medication: string;
   dosage: string;
+  frequency: string;
   instructions: string;
-  createdAt: string;
+  prescribedDate: string;
 };
 
 type Insurance = {
   providerName: string;
   policyNumber: string;
+  expireDate: string;
+  coverage: string;
   updatedAt: string;
 };
 
@@ -71,6 +76,7 @@ const PatientDashboard = () => {
   const [allergies, setAllergies] = useState<Allergy[]>([]);
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [surgeries, setSurgeries] = useState<Surgery[]>([]);
+  const [addInsurance, setAddInsurance] = useState<Insurance[]>([]);
   const [latestInsurance, setLatestInsurance] = useState<Insurance | null>(null);
   const [latestPrescriptions, setLatestPrescriptions] = useState<Prescription[]>([]);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
@@ -84,6 +90,8 @@ const PatientDashboard = () => {
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showSurgeryModal, setShowSurgeryModal] = useState(false);
   const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
+
+  const [showAddInsuranceModal, setShowAddInsuranceModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -125,6 +133,17 @@ const PatientDashboard = () => {
       const user = await res.json();
       setPatientProfile(user);
     } catch (err) {
+      setPatientProfile({
+        username: "dinesh",
+        email: "dinesh@example.com",
+        uniqueId: 2,
+        age: 25,
+        gender: "male",
+        dateOfBirth: "july 21 2000",
+        contact: "9452686045",
+        address: "corpus christi",
+        bloodGroup: "o+"
+      });
       console.error("Error fetching profile:", err);
     }
   };
@@ -133,6 +152,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(`${baseURL}/patient/appointments/${patientId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -152,6 +172,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(`${baseURL}/patient/allergies/${patientId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -170,6 +191,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(`${baseURL}/patient/insurance/${patientId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -188,6 +210,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(`${baseURL}/patient/conditions/${patientId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -206,6 +229,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const res = await fetch(`${baseURL}/patient/prescriptions/${patientId}`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -232,6 +256,28 @@ const PatientDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+  
+  const handleAddInsurance = async (allergy: { providerName: string; policyNumber: string; expireDate: string; coverage: string; updateAt: string; notes?: string }) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+  
+      const res = await fetch(`${baseURL}/patient/insurance/${patientId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(allergy),
+      });
+  
+      if (!res.ok) throw new Error("Failed to add allergy");
+  
+      const newInsurance = await res.json();
+      setAddInsurance((prev) => [...prev, newInsurance]);
+    } catch (err) {
+      console.error("Error adding allergy:", err);
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -257,8 +303,8 @@ const PatientDashboard = () => {
       </div>
 
       <div className="patient-grid-layout">
-        <div className="card wide-card" onClick={() => setShowAllergyModal(true)}>
-          <h2>Allergies</h2>
+        <div className="card wide-card">
+          <h2 onClick={() => setShowAllergyModal(true)}>Allergies</h2>
           <div className="allergy-list">
             {allergies.length ? (
               allergies.map((a, i) => <p key={i}>{a.allergyName} – Severity: {a.severity}</p>)
@@ -268,8 +314,10 @@ const PatientDashboard = () => {
           </div>
         </div>
 
-        <div className="card wide-card" onClick={() => setShowConditionModal(true)}>
-          <h2>Current Conditions</h2>
+        <div className="card wide-card">
+          <div className="card-header">
+            <h2 onClick={() => setShowConditionModal(true)}>Current Conditions</h2>
+          </div>
           <div className="condition-list">
             {conditions.length ? (
               conditions.map((c, i) => (
@@ -281,8 +329,11 @@ const PatientDashboard = () => {
           </div>
         </div>
 
-        <div className="card wide-card" onClick={() => setShowInsuranceModal(true)}>
-          <h2>Insurance Information</h2>
+        <div className="card wide-card">
+          <div className="card-header">
+            <h2 onClick={() => setShowInsuranceModal(true)}>Insurance Information</h2>
+            <Plus className="add-icon" onClick={() => setShowAddInsuranceModal(!showAddInsuranceModal)}/>
+          </div>
           <div className="insurance-info">
             {latestInsurance ? (
               <>
@@ -296,8 +347,10 @@ const PatientDashboard = () => {
           </div>
         </div>
 
-        <div className="card wide-card" onClick={() => setShowSurgeryModal(true)}>
-          <h2>Surgical History</h2>
+        <div className="card wide-card">
+          <div className="card-header">
+            <h2 onClick={() => setShowSurgeryModal(true)}>Surgical History</h2>
+          </div>
           <div className="surgery-list">
             {surgeries.length ? (
               surgeries.map((c, i) => (
@@ -309,11 +362,11 @@ const PatientDashboard = () => {
           </div>
         </div>
 
-        <div className="card wide-card" onClick={() => setShowPrescriptionModal(true)}>
-          <h2>Current Prescriptions</h2>
+        <div className="card wide-card">
+          <h2 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h2>
           {latestPrescriptions.length ? (
             latestPrescriptions.map((p, i) => (
-              <p key={i}><strong>{p.medication}</strong><br />Dosage: {p.dosage}<br />Instructions: {p.instructions}<br />Prescribed on: {new Date(p.createdAt).toLocaleDateString()}</p>
+              <p key={i}><strong>{p.medication}</strong><br />Dosage: {p.dosage}<br />Instructions: {p.instructions}<br />Prescribed on: {new Date(p.prescribedDate).toLocaleDateString()}</p>
             ))
           ) : (
             <p className="text-gray-600">No active prescriptions</p>
@@ -332,6 +385,12 @@ const PatientDashboard = () => {
           appointments={[...upcomingAppointments, ...pastAppointments]}
           title="All Appointments"
           onClose={() => setShowAppointmentsModal(false)}
+        />
+      )}
+      {showAddInsuranceModal && (
+        <AddInsuranceModal
+          onClose={() => setShowAddInsuranceModal(false)}
+          onAdd={handleAddInsurance}
         />
       )}
     </div>

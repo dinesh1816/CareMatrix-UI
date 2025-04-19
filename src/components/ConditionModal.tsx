@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 type Condition = {
   conditionName: string;
   createdAt: string;
+  status: string;
 };
 
 type Props = {
@@ -33,6 +34,7 @@ const ConditionModal: React.FC<Props> = ({ conditions, onClose }) => {
             <tr>
               <th>Condition Name</th>
               <th>Diagnosed On</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -41,11 +43,12 @@ const ConditionModal: React.FC<Props> = ({ conditions, onClose }) => {
                 <tr key={idx}>
                   <td>{item.conditionName}</td>
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+                  <td>{item.status}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={2} className="text-center">
+                <td colSpan={3} className="text-center">
                   No condition records found.
                 </td>
               </tr>

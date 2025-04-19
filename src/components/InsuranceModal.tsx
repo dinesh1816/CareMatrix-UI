@@ -7,6 +7,8 @@ import { X } from "lucide-react";
 type Insurance = {
   providerName: string;
   policyNumber: string;
+  expireDate: string;
+  coverage: string;
   updatedAt: string;
 };
 
@@ -34,6 +36,8 @@ const InsuranceModal: React.FC<Props> = ({ insuranceList, onClose }) => {
             <tr>
               <th>Provider</th>
               <th>Policy Number</th>
+              <th>Expire Date</th>
+              <th>Coverage</th>
               <th>Updated On</th>
             </tr>
           </thead>
@@ -43,12 +47,14 @@ const InsuranceModal: React.FC<Props> = ({ insuranceList, onClose }) => {
                 <tr key={idx}>
                   <td>{item.providerName}</td>
                   <td>{item.policyNumber}</td>
+                  <td>{item.expireDate}</td>
+                  <td>{item.coverage}</td>
                   <td>{new Date(item.updatedAt).toLocaleDateString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="text-center">
+                <td colSpan={5} className="text-center">
                   No insurance records found.
                 </td>
               </tr>

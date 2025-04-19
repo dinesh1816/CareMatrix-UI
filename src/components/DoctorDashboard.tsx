@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./DoctorDashboard.css";
+import AddAllergyModal from "./AddAllergyModal"; 
+import AddConditionModal from "./AddConditionModal";
+import AddPrescriptionModal from "./AddPrescriptionModal";
+import AddSurgeryModal from "./AddSurgeryModal";
 // import { users } from "../data/user";
 import AppointmentScheduler from "./AppointmentScheduler";
 import AppointmentsSection from "./AppointmentsSection";
@@ -13,6 +17,9 @@ import PrescriptionModal from "./PrescriptionModal";
 import SurgeryModal from "./SurgeryModal";
 import AppointmentsModal from "./AppointmentsModal";
 import { Search, UserCircle2, LogOut, Plus, Video, Calendar } from "lucide-react";
+
+const baseURL = process.env.REACT_APP_API_BASE_URL;
+const patientId = 2;
 
 type Appointment = {
   id: number;
@@ -30,18 +37,22 @@ type Allergy = {
 type Condition = {
   conditionName: string;
   createdAt: string;
+  status: string;
 };
 
 type Prescription = {
   medication: string;
   dosage: string;
+  frequency: string;
   instructions: string;
-  createdAt: string;
+  prescribedDate: string;
 };
 
 type Insurance = {
   providerName: string;
   policyNumber: string;
+  expireDate: string;
+  coverage: string;
   updatedAt: string;
 };
 
@@ -85,6 +96,11 @@ const DoctorDashboard = () => {
   const [showSurgeryModal, setShowSurgeryModal] = useState(false);
   const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
 
+  const [showAddAllergyModal, setShowAddAllergyModal] = useState(false); 
+  const [showAddConditionModal, setShowAddConditionModal] = useState(false);
+  const [showAddPrescriptionModal, setShowAddPrescriptionModal] = useState(false);
+  const [showAddSurgeryModal, setShowAddSurgeryModal] = useState(false);
+
   const [searchResult, setSearchResult] = useState<{
     name: string;
     id: number;
@@ -92,7 +108,7 @@ const DoctorDashboard = () => {
     gender: string;
     bloodGroup: string;
     conditions: { name: string; date: string; status: string }[];
-    prescriptions: { name: string; dosage: string; frequency: string; date: string }[];
+    prescriptions: { medication: string; dosage: string; frequency: string; instructions: string; prescribedDate: string }[];
     allergies: string[];
     insurance: { provider: string; policyNumber: string; expiryDate: string; coverage: string };
     surgeries: { name: string; date: string; hospital: string }[];
@@ -111,8 +127,8 @@ const DoctorDashboard = () => {
           { name: "Seasonal Allergies", date: "2018-03-22", status: "Ongoing" },
         ],
         prescriptions: [
-          { name: "Amoxicillin", dosage: "500mg", frequency: "Twice daily", date: "2023-12-01" },
-          { name: "Loratadine", dosage: "10mg", frequency: "Once daily", date: "2023-11-15" },
+          { medication: "Amoxicillin", dosage: "500mg", frequency: "Twice daily", instructions: "with water", prescribedDate: "2023-12-01" },
+          { medication: "Loratadine", dosage: "10mg", frequency: "Once daily", instructions: "empty stomach", prescribedDate: "2023-11-15" },
         ],
         allergies: ["Penicillin", "Peanuts", "Latex"],
         insurance: {
@@ -130,6 +146,108 @@ const DoctorDashboard = () => {
       setSearchResult(null);
     }
   };
+
+  const handleAddAllergy = async (allergy: { allergyName: string; severity: string; diagnosedDate: string; notes?: string }) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+  
+      const res = await fetch(`${baseURL}/patient/allergies/${patientId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(allergy),
+      });
+  
+      if (!res.ok) throw new Error("Failed to add allergy");
+  
+      const newAllergy = await res.json();
+      setAllergies((prev) => [...prev, newAllergy]);
+    } catch (err) {
+      console.error("Error adding allergy:", err);
+    }
+  };
+
+  const handleAddCondition = async (condition: { conditionName: string; status: string; diagnosedDate: string; notes?: string }) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+  
+      const res = await fetch(`${baseURL}/patient/conditions/${patientId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(condition),
+      });
+  
+      if (!res.ok) throw new Error("Failed to add allergy");
+  
+      const newAllergy = await res.json();
+      setConditions((prev) => [...prev, newAllergy]);
+    } catch (err) {
+      console.error("Error adding allergy:", err);
+    }
+  };
+
+  const handleAddPrescription = async (prescription: {
+    medication: string;
+    dosage: string;
+    frequency: string;
+    instructions: string;
+    prescribedDate: string;
+    notes?: string;
+  }) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+  
+      const res = await fetch(`${baseURL}/patient/prescriptions/${patientId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(prescription),
+      });
+  
+      if (!res.ok) throw new Error("Failed to add prescription");
+  
+      const newPrescription = await res.json();
+      setLatestPrescriptions((prev) => [...prev, newPrescription]);
+    } catch (err) {
+      console.error("Error adding prescription:", err);
+    }
+  };
+  
+  const handleAddSurgery = async (prescription: {
+    surgeryName: string;
+    surgeryDate: string;
+    surgeryHospital: string;
+    notes?: string;
+  }) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+  
+      const res = await fetch(`${baseURL}/patient/surgeries/${patientId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(prescription),
+      });
+  
+      if (!res.ok) throw new Error("Failed to add prescription");
+  
+      const newSurgery = await res.json();
+      setSurgeries((prev) => [...prev, newSurgery]);
+    } catch (err) {
+      console.error("Error adding prescription:", err);
+    }
+  };
+  
+  
 
   return (
     <div className="dashboard-container">
@@ -200,10 +318,10 @@ const DoctorDashboard = () => {
               <p>Blood Group: {searchResult.bloodGroup}</p>
             </div>
 
-            <div className="card" onClick={() => setShowAllergyModal(true)}>
+            <div className="card">
               <div className="card-header">
-                <h4>Allergies</h4>
-                <Plus className="add-icon" />
+                <h4 onClick={() => setShowAllergyModal(true)}>Allergies</h4>
+                <Plus className="add-icon" onClick={(() => setShowAddAllergyModal(!showAddAllergyModal))}/>
               </div>
               {searchResult.allergies.map((allergy, index) => (
                 <p key={index} className="allergy-item">
@@ -212,10 +330,11 @@ const DoctorDashboard = () => {
               ))}
             </div>
 
-            <div className="card" onClick={() => setShowConditionModal(true)}>
+            <div className="card">
               <div className="card-header">
-                <h4>Current Conditions</h4>
-                <Plus className="add-icon" />
+                <h4 onClick={() => setShowConditionModal(true)}>Current Conditions</h4>
+                <Plus className="add-icon" onClick={() => setShowAddConditionModal(true)}/>
+
               </div>
               {searchResult.conditions.map((cond, index) => (
                 <p key={index} className="condition-item">
@@ -228,27 +347,29 @@ const DoctorDashboard = () => {
               ))}
             </div>
 
-            <div className="card" onClick={() => setShowPrescriptionModal(true)}>
+            <div className="card">
               <div className="card-header">
-                <h4>Current Prescriptions</h4>
-                <Plus className="add-icon" />
+                <h4 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h4>
+                <Plus className="add-icon"  onClick={() => setShowAddConditionModal(true)} />
               </div>
               {searchResult.prescriptions.map((pres, index) => (
                 <p key={index} className="prescription-item">
-                  <strong>{pres.name}</strong>
+                  <strong>{pres.medication}</strong>
                   <br />
                   Dosage: {pres.dosage}
                   <br />
                   Frequency: {pres.frequency}
                   <br />
-                  Prescribed: {pres.date}
+                  Instructions: {pres.instructions}
+                  <br />
+                  Prescribed: {pres.prescribedDate}
                 </p>
               ))}
             </div>
 
-            <div className="card" onClick={() => setShowInsuranceModal(true)}>
+            <div className="card">
             <div className="card-header">
-              <h4>Insurance Information</h4>
+              <h4 onClick={() => setShowInsuranceModal(true)}>Insurance Information</h4>
             </div>
               <p className="insurance-info">
                 <strong>{searchResult.insurance.provider}</strong>
@@ -261,10 +382,10 @@ const DoctorDashboard = () => {
               </p>
             </div>
 
-            <div className="card" onClick={() => setShowSurgeryModal(true)}>
+            <div className="card">
               <div className="card-header">
-                <h4>Surgical History</h4>
-                <Plus className="add-icon" />
+                <h4 onClick={() => setShowSurgeryModal(true)}>Surgical History</h4>
+                <Plus className="add-icon" onClick={() => setShowAddSurgeryModal(true)}/>
               </div>
               {searchResult.surgeries.map((surgery, index) => (
                 <p key={index} className="surgery-item">
@@ -292,6 +413,35 @@ const DoctorDashboard = () => {
           onClose={() => setShowAppointmentsModal(false)}
         />
       )}
+
+      {showAddAllergyModal && (
+        <AddAllergyModal
+          onClose={() => setShowAddAllergyModal(false)}
+          onAdd={handleAddAllergy}
+        />
+      )}
+
+      {showAddConditionModal && (
+        <AddConditionModal
+          onClose={() => setShowAddConditionModal(false)}
+          onAdd={handleAddCondition}
+        />
+      )}
+
+      {showAddPrescriptionModal && (
+        <AddPrescriptionModal
+          onClose={() => setShowAddPrescriptionModal(false)}
+          onAdd={handleAddPrescription}
+        />
+      )}
+
+      {showAddSurgeryModal && (
+        <AddSurgeryModal
+          onClose={() => setShowAddSurgeryModal(false)}
+          onAdd={handleAddSurgery}
+        />
+      )}
+
     </div>
   );
 };

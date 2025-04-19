@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { X } from "lucide-react";
 import "./MedicalInfoModal.css"; // Reuse shared modal CSS
 
 type Allergy = {
@@ -31,10 +32,10 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ allergies, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-container">
-        <button className="modal-close-btn" onClick={onClose}>
-          &times;
-        </button>
-        <h2 className="modal-title">Allergies</h2>
+      <div className="modal-header">
+          <h2>Allergies</h2>
+          <X className="modal-close-btn" onClick={onClose} />
+        </div>
         <table className="modal-table">
           <thead>
             <tr>
