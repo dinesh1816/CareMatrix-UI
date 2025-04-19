@@ -1,37 +1,102 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./DoctorDashboard.css";
-import { users } from "../data/user"; 
+// import { users } from "../data/user";
 import AppointmentScheduler from "./AppointmentScheduler";
 import AppointmentsSection from "./AppointmentsSection";
 import TelemedicineModal from "./TelemedicineModal";
 import { ProfileModal } from "./ProfileModal";
-import { Search, UserCircle2, LogOut, Plus, Video, Calendar } from 'lucide-react';
+import AllergyModal from "./AllergyModal";
+import ConditionModal from "./ConditionModal";
+import InsuranceModal from "./InsuranceModal";
+import PrescriptionModal from "./PrescriptionModal";
+import SurgeryModal from "./SurgeryModal";
+import AppointmentsModal from "./AppointmentsModal";
+import { Search, UserCircle2, LogOut, Plus, Video, Calendar } from "lucide-react";
 
-const doctor = users.find((u) => u.role === "doctor");
+type Appointment = {
+  id: number;
+  appointmentDate: string;
+  reason: string;
+  status: string;
+  doctorName: string;
+};
+
+type Allergy = {
+  allergyName: string;
+  severity: string;
+};
+
+type Condition = {
+  conditionName: string;
+  createdAt: string;
+};
+
+type Prescription = {
+  medication: string;
+  dosage: string;
+  instructions: string;
+  createdAt: string;
+};
+
+type Insurance = {
+  providerName: string;
+  policyNumber: string;
+  updatedAt: string;
+};
+
+type Surgery = {
+  surgeryName: string;
+  surgeryDate: string;
+  surgeryHospital: string;
+};
+
+const doctor = {
+  username: "Dr. John Smith",
+  email: "doctor@example.com",
+  uniqueId: "CMX-DOC-1001",
+  age: 40,
+  gender: "Male",
+  dateOfBirth: "1983-01-01",
+  contact: "+1 (555) 987-6543",
+  address: "456 Clinic Ave, Wellness City, WC 54321",
+  bloodGroup: "A+",
+};
+
 const DoctorDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [showAppointmentScheduler, setShowAppointmentScheduler] = useState(false);
   const [showTelemedicineModal, setShowTelemedicineModal] = useState(false);
+  const [upcomingAppointments] = useState<Appointment[]>([]);
+  const [pastAppointments] = useState<Appointment[]>([]);
+  const [allergies, setAllergies] = useState<Allergy[]>([]);
+  const [conditions, setConditions] = useState<Condition[]>([]);
+  const [surgeries, setSurgeries] = useState<Surgery[]>([]);
+  const [latestInsurance, setLatestInsurance] = useState<Insurance | null>(null);
+  const [latestPrescriptions, setLatestPrescriptions] = useState<Prescription[]>([]);
+ 
+  const [searchId, setSearchId] = useState("");
   const navigate = useNavigate();
 
-  const [searchResult, setSearchResult] = useState<
-    | {
-        name: string;
-        id: number;
-        age: number;
-        gender: string;
-        bloodGroup: string;
-        conditions: { name: string; date: string; status: string }[];
-        prescriptions: { name: string; dosage: string; frequency: string; date: string }[];
-        allergies: string[];
-        insurance: { provider: string; policyNumber: string; expiryDate: string; coverage: string };
-        surgeries: { name: string; date: string; hospital: string }[];
-      }
-    | null
-  >(null);
+  const [showAllergyModal, setShowAllergyModal] = useState(false);
+  const [showConditionModal, setShowConditionModal] = useState(false);
+  const [showInsuranceModal, setShowInsuranceModal] = useState(false);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [showSurgeryModal, setShowSurgeryModal] = useState(false);
+  const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
 
-  const [searchId, setSearchId] = useState("");
+  const [searchResult, setSearchResult] = useState<{
+    name: string;
+    id: number;
+    age: number;
+    gender: string;
+    bloodGroup: string;
+    conditions: { name: string; date: string; status: string }[];
+    prescriptions: { name: string; dosage: string; frequency: string; date: string }[];
+    allergies: string[];
+    insurance: { provider: string; policyNumber: string; expiryDate: string; coverage: string };
+    surgeries: { name: string; date: string; hospital: string }[];
+  } | null>(null);
 
   const handleSearch = () => {
     if (searchId === "2") {
@@ -69,7 +134,7 @@ const DoctorDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="doctor-top-bar">
-        <h2>Dr. John Smith</h2>
+        <h2>{doctor.username}</h2>
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
           <Video />Telemedicine Consultation
         </button>
@@ -78,15 +143,25 @@ const DoctorDashboard = () => {
           <Calendar />Schedule Appointment
         </button>
         {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)} />}
-        <div className="icons"></div>
         <div className="icons">
-        <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
-        {/* ✅ Profile Modal */}
-        {showProfile && doctor && <ProfileModal user={doctor} onClose={() => setShowProfile(false)} />}
-        <LogOut className="icon" onClick={() => navigate("/")}/>
+          <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
+          {showProfile && (
+            <ProfileModal
+              user={doctor}
+              onClose={() => setShowProfile(false)}
+            />
+          )}
+          <LogOut className="icon" onClick={() => navigate("/")} />
         </div>
       </div>
-      <AppointmentsSection />
+      
+      <div onClick={() => setShowAppointmentsModal(true)}>
+      <AppointmentsSection
+        upcomingAppointments={upcomingAppointments}
+        pastAppointments={pastAppointments}
+      />
+      </div>
+
       <div className="search-container">
         <h3>Patient Search</h3>
         <div className="search-box">
@@ -99,19 +174,22 @@ const DoctorDashboard = () => {
             onChange={(e) => setSearchId(e.target.value)}
           />
           <button className="search-button" onClick={handleSearch}>
-            <Search className="search-icon"/>Search Patient
+            <Search className="search-icon" />Search Patient
           </button>
         </div>
       </div>
 
       {searchResult && (
         <div className="patient-records">
-           <div className="patient-record-header">
-      <h3>Patient Records</h3>
-      <div className="back-to-search">
-        <a href="#" onClick={() => setSearchResult(null)}>Back to Search Results</a>
-      </div>
-    </div>
+          <div className="patient-record-header">
+            <h3>Patient Records</h3>
+            <div className="back-to-search">
+              <button onClick={() => setSearchResult(null)} className="link-button">
+                Back to Search Results
+              </button>
+            </div>
+          </div>
+
           <div className="grid-layout">
             <div className="card">
               <h4>Patient Information</h4>
@@ -122,11 +200,11 @@ const DoctorDashboard = () => {
               <p>Blood Group: {searchResult.bloodGroup}</p>
             </div>
 
-            <div className="card">
-            <div className="card-header">
-            <h4>Allergies</h4>
-            <Plus className="add-icon"/>
-            </div>
+            <div className="card" onClick={() => setShowAllergyModal(true)}>
+              <div className="card-header">
+                <h4>Allergies</h4>
+                <Plus className="add-icon" />
+              </div>
               {searchResult.allergies.map((allergy, index) => (
                 <p key={index} className="allergy-item">
                   {allergy}
@@ -134,25 +212,26 @@ const DoctorDashboard = () => {
               ))}
             </div>
 
-            <div className="card">
-            <div className="card-header">
+            <div className="card" onClick={() => setShowConditionModal(true)}>
+              <div className="card-header">
                 <h4>Current Conditions</h4>
-                <Plus className="add-icon"/>
-            </div>
+                <Plus className="add-icon" />
+              </div>
               {searchResult.conditions.map((cond, index) => (
                 <p key={index} className="condition-item">
                   <strong>{cond.name}</strong>
                   <br />
-                  Diagnosed: {cond.date} <br />
+                  Diagnosed: {cond.date}
+                  <br />
                   Status: {cond.status}
                 </p>
               ))}
             </div>
 
-            <div className="card">
+            <div className="card" onClick={() => setShowPrescriptionModal(true)}>
               <div className="card-header">
-              <h4>Current Prescriptions</h4>
-              <Plus className="add-icon"/>
+                <h4>Current Prescriptions</h4>
+                <Plus className="add-icon" />
               </div>
               {searchResult.prescriptions.map((pres, index) => (
                 <p key={index} className="prescription-item">
@@ -167,8 +246,10 @@ const DoctorDashboard = () => {
               ))}
             </div>
 
-            <div className="card">
+            <div className="card" onClick={() => setShowInsuranceModal(true)}>
+            <div className="card-header">
               <h4>Insurance Information</h4>
+            </div>
               <p className="insurance-info">
                 <strong>{searchResult.insurance.provider}</strong>
                 <br />
@@ -180,11 +261,11 @@ const DoctorDashboard = () => {
               </p>
             </div>
 
-            <div className="card">
-            <div className="card-header">
+            <div className="card" onClick={() => setShowSurgeryModal(true)}>
+              <div className="card-header">
                 <h4>Surgical History</h4>
-                <Plus className="add-icon"/>
-                </div>
+                <Plus className="add-icon" />
+              </div>
               {searchResult.surgeries.map((surgery, index) => (
                 <p key={index} className="surgery-item">
                   <strong>{surgery.name}</strong>
@@ -197,6 +278,19 @@ const DoctorDashboard = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {showAllergyModal && <AllergyModal allergies={allergies} onClose={() => setShowAllergyModal(false)} />}
+      {showConditionModal && <ConditionModal conditions={conditions} onClose={() => setShowConditionModal(false)} />}
+      {showInsuranceModal && (<InsuranceModal insuranceList={latestInsurance ? [latestInsurance] : []} onClose={() => setShowInsuranceModal(false)}/>)}
+      {showPrescriptionModal && <PrescriptionModal prescriptions={latestPrescriptions} onClose={() => setShowPrescriptionModal(false)} />}
+      {showSurgeryModal && <SurgeryModal surgeries={surgeries} onClose={() => setShowSurgeryModal(false)} />}
+      {showAppointmentsModal && (
+        <AppointmentsModal
+          appointments={[...upcomingAppointments, ...pastAppointments]}
+          title="All Appointments"
+          onClose={() => setShowAppointmentsModal(false)}
+        />
       )}
     </div>
   );

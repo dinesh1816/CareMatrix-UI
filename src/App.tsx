@@ -5,6 +5,7 @@ import Signup from "./components/Signup";
 import PatientDashboard from "./components/PatientDashboard";
 import DoctorDashboard from "./components/DoctorDashboard";
 import "./App.css";
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
         </Routes>
       </div>
     </Router>

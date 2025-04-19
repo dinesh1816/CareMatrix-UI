@@ -1,0 +1,84 @@
+.user-table {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 1fr;
+    padding: 0.75rem 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 1fr;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.95rem;
+    color: #111827;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .name {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  
+  .email {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.5rem;
+    display: inline-block;
+    text-align: center;
+    width: fit-content;
+  }
+  
+  .badge.purple {
+    background-color: #f3e8ff;
+    color: #9333ea;
+  }
+  
+  .badge.green {
+    background-color: #d1fae5;
+    color: #047857;
+  }
+  
+  .badge.blue {
+    background-color: #e0e7ff;
+    color: #1e40af;
+  }
+  
+  .lock-icon {
+    font-size: 1.2rem;
+    color: #9ca3af;
+  }
+  
+  .view-detail {
+    color: #2563eb;
+    font-weight: 500;
+    cursor: pointer;
+    transition: text-decoration 0.2s;
+  }
+  
+  .view-detail:hover {
+    text-decoration: underline;
+  }
+  

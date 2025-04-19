@@ -8,17 +8,54 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Hardcoded credentials for patient login
-    if (email === "doctor@example.com" && password === "doctor123") {
-      navigate("/doctor-dashboard"); 
-    }// Redirect doctor
-    else if (email === "patient@example.com" && password === "patient123") {
-      navigate("/patient-dashboard");
-    } else {
-      alert("Invalid username or password");
+
+    try {
+      const response = await // Example with fetch
+      fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include", // ✅ Required to match allowCredentials=true
+        body: JSON.stringify({ email, password })
+      });
+      
+
+      // if (!response.ok) {
+      //   // throw new Error("Invalid credentials");
+      // }
+
+      const data = await response.json();
+      const { token, role, id } = data;
+
+      // Save token and user info to localStorage
+      localStorage.setItem("jwtToken", token);
+      localStorage.setItem("role", role);
+      localStorage.setItem("userId", id);
+
+      // Navigate based on role
+      if (role === "DOCTOR") {
+        navigate("/doctor-dashboard");
+      } else if (role === "PATIENT") {
+        navigate("/patient-dashboard");
+      } else if (role === "ADMIN") {
+        navigate("/admin")
+      }else {
+        alert("Unknown user role");
+      }
+
+    } catch (error) {
+      // alert("Login failed: ");
+      console.log("inside login error");
+      if(email === "admin@example.com" && password === "admin123") {
+        navigate("/admin-dashboard")
+      } else if (email === "patient@example.com" && password === "patient123") {
+        navigate("/patient-dashboard")
+      } else if (email === "doctor@example.com" && password === "doctor123") {
+        navigate("/doctor-dashboard")
+      }
     }
   };
 

@@ -1,0 +1,35 @@
+.paginated-modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 9999; display: flex; align-items: center; justify-content: center; animation: fadeBackdrop 0.3s ease; }
+
+.paginated-modal { background-color: #fff; width: 90%; max-width: 850px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); overflow: hidden; display: flex; flex-direction: column; animation: slideIn 0.3s ease; }
+
+.paginated-modal-header { background-color: #f1f1f1; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+
+.paginated-modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 600; color: #333; }
+
+.paginated-modal-header button { background: transparent; border: none; font-size: 1.5rem; font-weight: bold; cursor: pointer; color: #666; }
+
+.paginated-modal-header button:hover { color: #000; }
+
+.paginated-modal-content { padding: 1.25rem 1.5rem; overflow-y: auto; max-height: 400px; }
+
+.paginated-modal-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+
+.paginated-modal-table thead { background-color: #f9f9f9; }
+
+.paginated-modal-table th, .paginated-modal-table td { padding: 0.75rem 1rem; border: 1px solid #e2e2e2; text-align: left; }
+
+.paginated-modal-table th { font-weight: 600; color: #444; }
+
+.paginated-modal-table tbody tr:hover { background-color: #f5f5f5; }
+
+.paginated-modal-pagination { padding: 0.75rem 1.5rem; display: flex; justify-content: flex-end; gap: 0.5rem; border-top: 1px solid #e2e2e2; background-color: #fafafa; }
+
+.paginated-modal-pagination button { padding: 0.5rem 0.9rem; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 5px; background-color: #fff; cursor: pointer; transition: all 0.2s ease; }
+
+.paginated-modal-pagination button:hover:not(:disabled) { background-color: #eee; }
+
+.paginated-modal-pagination button:disabled { color: #aaa; background-color: #f4f4f4; cursor: not-allowed; }
+
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+@keyframes fadeBackdrop { from { background-color: rgba(0, 0, 0, 0); } to { background-color: rgba(0, 0, 0, 0.6); } }

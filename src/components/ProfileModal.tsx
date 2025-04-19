@@ -1,105 +1,81 @@
-import React, { useState } from 'react';
-import { User } from '../types';
-import { Pencil, X } from 'lucide-react';
-import './ProfileModal.css'; // Make sure to import the CSS file
+import React from "react";
+import "./ProfileModal.css";
+import { X, Pencil } from "lucide-react";
 
-interface ProfileModalProps {
+type User = {
+  username: string;
+  email: string;
+  uniqueId: string | number;
+  age: number;
+  gender: string;
+  dateOfBirth: string;
+  contact: string;
+  address: string;
+  bloodGroup: string;
+};
+
+type ProfileModalProps = {
   user: User;
   onClose: () => void;
-}
+};
 
-export function ProfileModal({ user, onClose }: ProfileModalProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState(user);
-
-  const handleSave = () => {
-    alert('Profile update functionality will be implemented soon');
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditedUser(user); // Revert changes
-    setIsEditing(false);
-  };
-
-  const renderField = (label: string, field: keyof User) => {
-    const value = user[field];
-  
-    if (!value) return null;
-  
-    return (
-      <div className="profile-field">
-        <span className="profile-label">{label}</span>
-        {isEditing ? (
-          <input
-            type="text"
-            value={typeof value === 'string' || typeof value === 'number' ? value : ''}
-            onChange={(e) => setEditedUser({ ...editedUser, [field]: e.target.value })}
-            className="profile-input"
-          />
-        ) : (
-          <span className="profile-text">
-            {Array.isArray(value) ? (
-              value.map((item, index) => (
-                <span key={index} className="block">
-                  {typeof item === 'string'
-                    ? item
-                    : JSON.stringify(item, null, 2) /* Handle objects properly */}
-                </span>
-              ))
-            ) : typeof value === 'object' ? (
-              JSON.stringify(value, null, 2) /* Convert objects to readable strings */
-            ) : (
-              value
-            )}
-          </span>
-        )}
-      </div>
-    );
-  };
-  
-
+export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
   return (
-    <div className="profile-modal-overlay" onClick={onClose}>
-      <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
-        {/* ✅ Modal Header */}
+    <div className="profile-modal-overlay">
+      <div className="profile-modal">
+        {/* ✅ Header with icons */}
         <div className="profile-modal-header">
-        <h2>{user.role === 'doctor' ? 'Doctor Profile' : 'Patient Profile'}</h2>
+          <span>Patient Profile</span>
           <div className="modal-header-icons">
-            {!isEditing && (
-              <button className="edit-button" onClick={() => setIsEditing(true)}>
-                <Pencil className="w-5 h-5 text-blue-600" />
-              </button>
-            )}
-            <button className="close-button" onClick={onClose}>
-              <X className="w-6 h-6" />
-            </button>
+            <Pencil className="edit-button" />
+            <X className="close-button" onClick={onClose} />
           </div>
         </div>
 
-        {/* ✅ Modal Content */}
-        <div className="profile-modal-content">
-          <div className="profile-grid">
-            {renderField('Name', 'name')}
-            {renderField('Email', 'email')}
-            {renderField('Unique ID', 'id')}
-            {renderField('Age', 'age')}
-            {renderField('Gender', 'gender')}
-            {renderField('Date of Birth', 'dateOfBirth')}
-            {renderField('Contact', 'contact')}
-            {renderField('Address', 'address')}
-            {user.role === 'patient' && renderField('Blood Group', 'bloodGroup')}
+        {/* ✅ Grid layout */}
+        <div className="profile-grid">
+          <div className="profile-field">
+            <span className="profile-label">Name</span>
+            <span className="profile-text">{user.username}</span>
+          </div>
+          <div className="profile-field">
+            <span className="profile-label">Email</span>
+            <span className="profile-text">{user.email}</span>
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">Unique ID</span>
+            <span className="profile-text">{user.uniqueId}</span>
+          </div>
+          <div className="profile-field">
+            <span className="profile-label">Age</span>
+            <span className="profile-text">{user.age}</span>
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">Gender</span>
+            <span className="profile-text">{user.gender}</span>
+          </div>
+          <div className="profile-field">
+            <span className="profile-label">Date of Birth</span>
+            <span className="profile-text">{user.dateOfBirth}</span>
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">Contact</span>
+            <span className="profile-text">{user.contact}</span>
+          </div>
+          <div className="profile-field">
+            <span className="profile-label">Address</span>
+            <span className="profile-text">{user.address}</span>
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">Blood Group</span>
+            <span className="profile-text">{user.bloodGroup}</span>
           </div>
         </div>
-
-        {/* ✅ Modal Footer - Show buttons only when editing */}
-        {isEditing && (
-          <div className="profile-modal-footer">
-            <button className="profile-save-btn" onClick={handleSave}>Save Changes</button>
-            <button className="profile-cancel-btn" onClick={handleCancel}>Cancel</button>
-          </div>
-        )}
       </div>
     </div>
   );
-}
+};
