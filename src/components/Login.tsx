@@ -21,11 +21,6 @@ const Login = () => {
         credentials: "include", // ✅ Required to match allowCredentials=true
         body: JSON.stringify({ email, password })
       });
-      
-
-      // if (!response.ok) {
-      //   // throw new Error("Invalid credentials");
-      // }
 
       const data = await response.json();
       const { token, role, id } = data;
@@ -34,28 +29,14 @@ const Login = () => {
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("role", role);
       localStorage.setItem("userId", id);
-
-      // Navigate based on role
-      if (role === "DOCTOR") {
-        navigate("/doctor-dashboard");
-      } else if (role === "PATIENT") {
-        navigate("/patient-dashboard");
-      } else if (role === "ADMIN") {
-        navigate("/admin")
-      }else {
-        alert("Unknown user role");
-      }
-
-    } catch (error) {
-      // alert("Login failed: ");
-      console.log("inside login error");
-      if(email === "admin@example.com" && password === "admin123") {
-        navigate("/admin-dashboard")
-      } else if (email === "patient@example.com" && password === "patient123") {
+      
+      if(role === "patient") {
         navigate("/patient-dashboard")
-      } else if (email === "doctor@example.com" && password === "doctor123") {
-        navigate("/doctor-dashboard")
+      } else if (role === "/doctor-dashbaord") {
+        navigate("doctor-dashboard")
       }
+    } catch (error) {
+      alert("Login failed: ");
     }
   };
 

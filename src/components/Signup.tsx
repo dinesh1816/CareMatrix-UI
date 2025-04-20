@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stethoscope } from 'lucide-react';
+import { Stethoscope } from "lucide-react";
 import "./Signup.css";
 
 const Signup = () => {
@@ -8,30 +8,43 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("Male");
+  const [date, setDate] = useState("");
+  const [contact, setContact] = useState("");
+  const [address, setAddress] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("A+");
 
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // prevent form reload
+    e.preventDefault();
 
     try {
+      const user = {
+        username: name,
+        email: email,
+        password: password,
+        role: signupRole,
+        age: parseInt(age),
+        gender: gender,
+        dateOfBirth: date,
+        contact: contact,
+        address: address,
+        bloodGroup: bloodGroup
+      };
       const response = await fetch("http://localhost:8000/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username: name,
-          email: email,
-          password: password,
-          role: signupRole
-        }),
+        body: JSON.stringify(user),
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log("Signup successful:", data);
-        navigate("/"); // redirect to login
+        navigate("/");
       } else {
         const err = await response.json();
         console.error("Signup failed:", err);
@@ -72,15 +85,34 @@ const Signup = () => {
               <option value="DOCTOR">Doctor</option>
             </select>
           </div>
-          {/* Optional fields (not sent to signup API but kept for form completeness) */}
-          <div className="input-group"><label>Age</label><input type="number" /></div>
-          <div className="input-group"><label>Gender</label><select><option>Male</option><option>Female</option></select></div>
-          <div className="input-group"><label>Date of Birth</label><input type="date" /></div>
-          <div className="input-group"><label>Contact</label><input type="text" /></div>
-          <div className="input-group full-width"><label>Address</label><input type="text" /></div>
+
+          <div className="input-group">
+            <label>Age</label>
+            <input type="number" value={age} onChange={(e) => setAge(e.target.value)} />
+          </div>
+          <div className="input-group">
+            <label>Gender</label>
+            <select value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div className="input-group">
+            <label>Date of Birth</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div className="input-group">
+            <label>Contact</label>
+            <input type="text" value={contact} onChange={(e) => setContact(e.target.value)} />
+          </div>
+          <div className="input-group full-width">
+            <label>Address</label>
+            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
+          </div>
           <div className="input-group full-width">
             <label>Blood Group</label>
-            <select>
+            <select value={bloodGroup} onChange={(e) => setBloodGroup(e.target.value)}>
               <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
               <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
             </select>
