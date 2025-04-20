@@ -1,174 +1,133 @@
-/* ✅ Modal Overlay */
+/* FULLSCREEN OVERLAY */
 .profile-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 1000;
-    max-height: 90vh; /* Prevents it from overflowing off-screen */
-    overflow-y: auto; /* Enables scrolling if content is too long */
-  }
-  
-  /* ✅ Modal Container */
-  .profile-modal {
-    background: white;
-    border-radius: 10px;
-    width: 600px;
-    max-width: 90%;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-  
-/* ✅ Ensure the Modal is Centered Properly */
-.profile-modal-overlay .profile-modal {
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none; /* Removes any unintentional positioning */
-  }
-
-  /* ✅ Modal Header */
-  .profile-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 18px;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
-  
-  /* ✅ Icons in Header */
-  .modal-header-icons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  /* ✅ Close & Edit Button */
-/* ✅ Ensure the buttons have no border or background */
-.close-button {
-  all: unset; /* Reset inherited styles */
-    color: #9ca3af; /* Light gray */
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    transition: color 0.2s ease-in-out; 
+  position: fixed;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  height: 50%;
+  width: 50%;
+  /* background-color: rgba(0, 0, 0, 0.5); */
 }
+
+/* ABSOLUTE CENTER MODAL USING TRANSFORM */
+.profile-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 720px;
+  max-width: 90%;
+  padding: 28px 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 1001;
+}
+
+
+/* HEADER */
+.profile-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 28px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+}
+
+.profile-modal-header span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Pencil Icon */
 .edit-button {
-    all: unset; /* Reset inherited styles */
-    color: #9ca3af; /* Light gray */
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    transition: color 0.2s ease-in-out;
+  height: 18px;
+  width: 18px;
+  color: #2563eb;
+  cursor: pointer;
 }
 
-/* ✅ Remove hover background to keep them clean */
-.close-button:hover,
-.edit-button:hover {
-    color: #6b7280; /* Slightly darker gray */
-    background: none; /* Remove any background color */
+/* Close Icon */
+.modal-header-icons .close-button {
+  height: 22px;
+  width: 22px;
+  color: #9ca3af;
+  cursor: pointer;
 }
 
-/* ✅ Prevent unwanted outlines when clicking */
-.close-button:focus,
-.edit-button:focus {
-    outline: none;
-    box-shadow: none;
+/* GRID FOR FIELDS */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 40px;
+  row-gap: 24px;
 }
 
-/* ✅ Make sure they are positioned correctly */
-.modal-header-icons {
-    display: flex;
-    gap: 10px;
+/* LABEL */
+.profile-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
+/* VALUE TEXT */
+.profile-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+}
 
-  
-  /* ✅ Grid Layout */
-  .profile-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
-  
-  /* ✅ Profile Fields */
-  .profile-field {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .profile-label {
-    font-size: 14px;
-    font-weight: bold;
-    color: #6b7280; /* Gray text */
-  }
-  
-  .profile-text {
-    font-size: 16px;
-    color: black;
-  }
-  
-  /* ✅ Input Fields when Editing */
-  .profile-input {
-    width: 90%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    margin-top: 5px;
-  }
-  
-  /* ✅ Modal Footer */
-  .profile-modal-footer {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-    margin-top: 10px;
-  }
-  
-  /* ✅ Save & Cancel Buttons */
-  .profile-save-btn {
-    background: #2563eb;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  
-  .profile-cancel-btn {
-    background: #f3f4f6;
-    color: #374151;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  
-  .profile-save-btn:hover {
-    background: #1e40af;
-  }
-  
-  .profile-cancel-btn:hover {
-    background: #e5e7eb;
-  }
-  
+/* INPUT FIELD (WHEN EDITING) */
+.profile-input {
+  font-size: 16px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #111827;
+  background-color: #f9fafb;
+  width: 100%;
+}
+
+/* FOOTER BUTTONS (EDIT MODE ONLY) */
+.profile-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 32px;
+  gap: 12px;
+}
+
+.profile-save-btn,
+.profile-cancel-btn {
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.profile-save-btn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.profile-save-btn:hover {
+  background-color: #1e40af;
+}
+
+.profile-cancel-btn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.profile-cancel-btn:hover {
+  background-color: #e5e7eb;
+}
