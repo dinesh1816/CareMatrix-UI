@@ -3,14 +3,18 @@ import "./ProfileModal.css";
 import { X, Pencil } from "lucide-react";
 
 type User = {
-  username: string;
-  email: string;
-  uniqueId: string | number;
+  name: string;
+  emailAddress: string;
+  id: string | number;
   age: number;
   gender: string;
   dateOfBirth: string;
-  contact: string;
-  address: string;
+  mobileNumber: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: string;
   bloodGroup: string;
 };
 
@@ -61,13 +65,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => 
             {isEditing ? (
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 className="profile-input"
               />
             ) : (
-              <span className="profile-text">{formData.username}</span>
+              <span className="profile-text">{formData.name}</span>
             )}
           </div>
 
@@ -76,19 +80,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => 
             {isEditing ? (
               <input
                 type="email"
-                name="email"
-                value={formData.email}
+                name="emailAddress"
+                value={formData.emailAddress}
                 onChange={handleChange}
                 className="profile-input"
               />
             ) : (
-              <span className="profile-text">{formData.email}</span>
+              <span className="profile-text">{formData.emailAddress}</span>
             )}
           </div>
 
           <div className="profile-field">
             <span className="profile-label">Unique ID: </span>
-            <span className="profile-text">{formData.uniqueId}</span>
+            <span className="profile-text">{formData.id}</span>
           </div>
 
           <div className="profile-field">
@@ -141,28 +145,90 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => 
             {isEditing ? (
               <input
                 type="text"
-                name="contact"
-                value={formData.contact}
+                name="mobileNumber"
+                value={formData.mobileNumber}
                 onChange={handleChange}
                 className="profile-input"
               />
             ) : (
-              <span className="profile-text">{formData.contact}</span>
+              <span className="profile-text">{formData.mobileNumber}</span>
             )}
           </div>
-
+          
           <div className="profile-field">
-            <span className="profile-label">Address: </span>
+            <span className="profile-label">Street: </span>
             {isEditing ? (
               <input
                 type="text"
                 name="address"
-                value={formData.address}
+                value={formData.street}
                 onChange={handleChange}
                 className="profile-input"
               />
             ) : (
-              <span className="profile-text">{formData.address}</span>
+              <span className="profile-text">{formData.street}</span>
+            )}
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">City: </span>
+            {isEditing ? (
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-text">{formData.city}</span>
+            )}
+          </div>
+
+
+
+          <div className="profile-field">
+            <span className="profile-label">State: </span>
+            {isEditing ? (
+              <input
+                type="text"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-text">{formData.state}</span>
+            )}
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">Country: </span>
+            {isEditing ? (
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-text">{formData.country}</span>
+            )}
+          </div>
+
+          <div className="profile-field">
+            <span className="profile-label">Zipcode: </span>
+            {isEditing ? (
+              <input
+                type="text"
+                name="zipcode"
+                value={formData.zipcode}
+                onChange={handleChange}
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-text">{formData.zipcode}</span>
             )}
           </div>
 

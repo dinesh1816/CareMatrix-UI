@@ -8,7 +8,6 @@ interface AddInsuranceModalProps {
     policyNumber: string;
     expireDate: string;
     coverage: string;
-    updateAt: string;
     notes?: string;
   }) => void;
 }
@@ -19,11 +18,10 @@ const AddInsuranceModal: React.FC<AddInsuranceModalProps> = ({ onClose, onAdd })
   const [expireDate, setExpireDate] = useState("");
   const [coverage, setCoverage] = useState("");
   const [notes, setNotes] = useState("");
-  const updateAt = new Date().toString();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAdd({ providerName, policyNumber, expireDate, coverage, updateAt, notes });
+    onAdd({ providerName, policyNumber, expireDate, coverage, notes });
     onClose();
   };
 

@@ -1,6 +1,4 @@
-// src/components/AppointmentsModal.tsx
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./MedicalInfoModal.css";
 import { X } from "lucide-react";
 
@@ -10,18 +8,45 @@ type Appointment = {
   reason: string;
   status: string;
   doctorName: string;
+  patientName: string;
 };
 
 interface AppointmentsModalProps {
-  appointments: Appointment[];
   title: string;
   onClose: () => void;
 }
 
+const baseURL = process.env.REACT_APP_API_BASE_URL;
+const patientId = localStorage.getItem("userId");
 const ITEMS_PER_PAGE = 5;
 
-const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ appointments, title, onClose }) => {
+const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose }) => {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const fetchAppointmentData = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        const res = await fetch(`${baseURL}/appointments/${patientId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch appointments");
+
+        const appointmentsList = await res.json();
+        setAppointments(appointmentsList);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      }
+    };
+
+    fetchAppointmentData();
+  }, []);
+
   const totalPages = Math.ceil(appointments.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentItems = appointments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -40,6 +65,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ appointments, tit
               <th>Reason</th>
               <th>Status</th>
               <th>Doctor</th>
+              <th>Patient</th>
             </tr>
           </thead>
           <tbody>
@@ -50,11 +76,12 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ appointments, tit
                   <td>{a.reason}</td>
                   <td>{a.status}</td>
                   <td>{a.doctorName}</td>
+                  <td>{a.patientName}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="text-center">No appointments found.</td>
+                <td colSpan={5} className="text-center">No appointments found.</td>
               </tr>
             )}
           </tbody>

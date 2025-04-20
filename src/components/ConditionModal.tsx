@@ -1,68 +1,107 @@
-// src/components/ConditionModal.tsx
-
-import React, { useState } from "react";
-import "./MedicalInfoModal.css";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import "./MedicalInfoModal.css";
 
 type Condition = {
   conditionName: string;
-  createdAt: string;
   status: string;
+  diagnosedDate: string;
 };
 
-type Props = {
-  conditions: Condition[];
+interface ConditionModalProps {
+  userId: string | null;
   onClose: () => void;
-};
+}
 
-const ITEMS_PER_PAGE = 5;
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 
-const ConditionModal: React.FC<Props> = ({ conditions, onClose }) => {
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(conditions.length / ITEMS_PER_PAGE);
-  const paginated = conditions.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+const ConditionModal: React.FC<ConditionModalProps> = ({ userId, onClose }) => {
+  const [conditions, setConditions] = useState<Condition[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
+  const fetchConditions = async (page: number, size: number) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await fetch(`${baseURL}/patient/${userId}/conditions?page=${page}&size=${size}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch conditions");
+
+      const data = await response.json();
+      setConditions(data.content);
+      setTotalPages(data.totalPages);
+      setTotalRecords(data.totalElements);
+    } catch (err) {
+      console.error("Error fetching conditions:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchConditions(currentPage, pageSize);
+  }, [currentPage, pageSize]);
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = Number(e.target.value);
+    setPageSize(newSize);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2>Current Conditions</h2>
+          <h2>Conditions</h2>
           <X className="modal-close-btn" onClick={onClose} />
         </div>
+
         <table className="modal-table">
           <thead>
             <tr>
               <th>Condition Name</th>
-              <th>Diagnosed On</th>
               <th>Status</th>
+              <th>Diagnosed Date</th>
             </tr>
           </thead>
           <tbody>
-            {paginated.length > 0 ? (
-              paginated.map((item, idx) => (
-                <tr key={idx}>
+            {conditions.length > 0 ? (
+              conditions.map((item, index) => (
+                <tr key={index}>
                   <td>{item.conditionName}</td>
-                  <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td>{item.status}</td>
+                  <td>{new Date(item.diagnosedDate).toLocaleDateString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="text-center">
-                  No condition records found.
-                </td>
+                <td colSpan={3} className="text-center">No condition records found.</td>
               </tr>
             )}
           </tbody>
         </table>
+
         <div className="modal-pagination">
-          <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-            Previous
-          </button>
-          <span>{page} of {totalPages}</span>
-          <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
-            Next
-          </button>
+          <button onClick={handlePrev} disabled={currentPage === 1}>Previous</button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button onClick={handleNext} disabled={currentPage === totalPages}>Next</button>
+          <select value={pageSize} onChange={handlePageSizeChange}>
+            <option value={3}>3 / page</option>
+            <option value={5}>5 / page</option>
+            <option value={10}>10 / page</option>
+          </select> 
         </div>
       </div>
     </div>

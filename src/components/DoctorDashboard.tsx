@@ -19,7 +19,6 @@ import AppointmentsModal from "./AppointmentsModal";
 import { Search, UserCircle2, LogOut, Plus, Video, Calendar } from "lucide-react";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
-const patientId = 2;
 
 type Appointment = {
   id: number;
@@ -63,14 +62,18 @@ type Surgery = {
 };
 
 const doctor = {
-  username: "Dr. John Smith",
-  email: "doctor@example.com",
-  uniqueId: "CMX-DOC-1001",
+  name: "Dr. John Smith",
+  emailAddress: "doctor@example.com",
+  id: "CMX-DOC-1001",
   age: 40,
   gender: "Male",
   dateOfBirth: "1983-01-01",
-  contact: "+1 (555) 987-6543",
-  address: "456 Clinic Ave, Wellness City, WC 54321",
+  mobileNumber: "+1 (555) 987-6543",
+  street: "spid",
+  city: "corpus christi",
+  state: "texas",
+  country: "USA",
+  zipcode: "78412",
   bloodGroup: "A+",
 };
 
@@ -87,6 +90,9 @@ const DoctorDashboard = () => {
   const [latestPrescriptions, setLatestPrescriptions] = useState<Prescription[]>([]);
  
   const [searchId, setSearchId] = useState("");
+  const [searchName, setSearchName] = useState("");
+  const [searchDob, setSearchDob] = useState("");
+  const [patientId, setPatientId] = useState("");
   const navigate = useNavigate();
 
   const [showAllergyModal, setShowAllergyModal] = useState(false);
@@ -252,7 +258,7 @@ const DoctorDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="doctor-top-bar">
-        <h2>{doctor.username}</h2>
+        <h2>{doctor.name}</h2>
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
           <Video />Telemedicine Consultation
         </button>
@@ -283,8 +289,8 @@ const DoctorDashboard = () => {
       <div className="search-container">
         <h3>Patient Search</h3>
         <div className="search-box">
-          <input type="text" placeholder="Enter patient name" />
-          <input type="text" placeholder="mm/dd/yyyy" />
+          <input type="text" placeholder="Enter patient name" onChange={(e) => setSearchName(e.target.value)} />
+          <input type="text" placeholder="mm/dd/yyyy" onChange={(e) => setSearchDob(e.target.value)}/>
           <input
             type="text"
             placeholder="Enter patient ID"
@@ -401,14 +407,13 @@ const DoctorDashboard = () => {
         </div>
       )}
 
-      {showAllergyModal && <AllergyModal allergies={allergies} onClose={() => setShowAllergyModal(false)} />}
-      {showConditionModal && <ConditionModal conditions={conditions} onClose={() => setShowConditionModal(false)} />}
-      {showInsuranceModal && (<InsuranceModal insuranceList={latestInsurance ? [latestInsurance] : []} onClose={() => setShowInsuranceModal(false)}/>)}
-      {showPrescriptionModal && <PrescriptionModal prescriptions={latestPrescriptions} onClose={() => setShowPrescriptionModal(false)} />}
-      {showSurgeryModal && <SurgeryModal surgeries={surgeries} onClose={() => setShowSurgeryModal(false)} />}
+      {showAllergyModal && <AllergyModal userId={patientId} onClose={() => setShowAllergyModal(false)} />}
+      {showConditionModal && <ConditionModal userId={patientId} onClose={() => setShowConditionModal(false)} />}
+      {showInsuranceModal && (<InsuranceModal userId={patientId} onClose={() => setShowInsuranceModal(false)}/>)}
+      {showPrescriptionModal && <PrescriptionModal userId={patientId} onClose={() => setShowPrescriptionModal(false)} />}
+      {showSurgeryModal && <SurgeryModal userId={patientId} onClose={() => setShowSurgeryModal(false)} />}
       {showAppointmentsModal && (
         <AppointmentsModal
-          appointments={[...upcomingAppointments, ...pastAppointments]}
           title="All Appointments"
           onClose={() => setShowAppointmentsModal(false)}
         />

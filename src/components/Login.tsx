@@ -10,25 +10,26 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    const loginRole = "doctor";
     try {
       const response = await // Example with fetch
-      fetch("http://localhost:8000/api/auth/login", {
+      fetch("http://localhost:8080/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         credentials: "include", // ✅ Required to match allowCredentials=true
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ username: email, password, role: loginRole })
       });
 
       const data = await response.json();
-      const { token, role, id } = data;
+      const { token, role, id, userName } = data;
 
       // Save token and user info to localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("role", role);
       localStorage.setItem("userId", id);
+      localStorage.setItem("userName", userName);
       
       if(role === "patient") {
         navigate("/patient-dashboard")
