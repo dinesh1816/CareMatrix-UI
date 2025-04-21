@@ -75,6 +75,7 @@ type PatientProfile = {
 };
 
 const PatientDashboard = () => {
+  console.log("inside patient dashboard");
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
   const [pastAppointments, setPastAppointments] = useState<Appointment[]>([]);
   const [allergies, setAllergies] = useState<Allergy[]>([]);

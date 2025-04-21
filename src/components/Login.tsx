@@ -4,7 +4,7 @@ import { Stethoscope } from 'lucide-react';
 import "./Login.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [enterUsername, setEnterUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -19,21 +19,23 @@ const Login = () => {
           "Content-Type": "application/json"
         },
         credentials: "include", // ✅ Required to match allowCredentials=true
-        body: JSON.stringify({ username: email, password, role: loginRole })
+        body: JSON.stringify({ username: enterUsername, password })
       });
 
       const data = await response.json();
       const { token, role, id, username } = data;
+      const localstorageuserrole = role.toLowerCase();
 
       // Save token and user info to localStorage
       localStorage.setItem("jwtToken", token);
-      localStorage.setItem("role", role);
+      localStorage.setItem("role", localstorageuserrole);
       localStorage.setItem("userId", id);
       localStorage.setItem("userName", username);
+      console.log("loggedin successfully");
       
-      if(role === "patient") {
+      if(localstorageuserrole === "patient") {
         navigate("/patient-dashboard")
-      } else if (role === "doctor") {
+      } else if (localstorageuserrole === "doctor") {
         navigate("doctor-dashboard")
       }
     } catch (error) {
@@ -54,11 +56,11 @@ const Login = () => {
     <div className="login-form">
       <form  onSubmit={handleSubmit}>
         <div className="input-group">
-          <label>Email</label>
+          <label>Username</label>
           <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)}
+            type="username" 
+            value={enterUsername} 
+            onChange={(e) => setEnterUsername(e.target.value)}
             required
           />
         </div>

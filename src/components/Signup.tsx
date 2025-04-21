@@ -12,10 +12,26 @@ const Signup = () => {
   const [gender, setGender] = useState("Male");
   const [date, setDate] = useState("");
   const [contact, setContact] = useState("");
-  const [address, setAddress] = useState("");
   const [bloodGroup, setBloodGroup] = useState("A+");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
+  const [zipcode, setZipcode] = useState("");
 
   const navigate = useNavigate();
+
+  function formatDateToYYYYMMDD(dateInput: string | Date): string {
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return ''; // Invalid date
+  
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0'); // Month is 0-indexed
+    const day = `${date.getDate()}`.padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
+  }
+  
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,17 +39,28 @@ const Signup = () => {
     try {
       const user = {
         username: name,
-        email: email,
+        name: name,
+        emailAddress: email,
         password: password,
         role: signupRole,
         age: parseInt(age),
         gender: gender,
-        dateOfBirth: date,
-        contact: contact,
-        address: address,
-        bloodGroup: bloodGroup
+        dateOfBirth: formatDateToYYYYMMDD(date),
+        mobileNumber: contact,
+        bloodGroup: bloodGroup,
+        street: street,
+        city: city,
+        state: state,
+        country: country,
+        zipcode: zipcode,
+        email: email,
+        phone: contact,
+        experience: "",
+        licenseNumber: 0,
+        department: "",
+        education: ""
       };
-      const response = await fetch("http://localhost:8000/api/auth/signup", {
+      const response = await fetch("http://localhost:8080/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,14 +68,12 @@ const Signup = () => {
         body: JSON.stringify(user),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Signup successful:", data);
+      const data = await response.text();
+
+      if (data === "User registered successfully.") {
         navigate("/");
       } else {
-        const err = await response.json();
-        console.error("Signup failed:", err);
-        alert("Signup failed: " + err.message);
+        alert("Signup failed: Invalid entry");
       }
     } catch (error) {
       console.error("Error during signup:", error);
@@ -81,8 +106,8 @@ const Signup = () => {
           <div className="input-group">
             <label>Role *</label>
             <select value={signupRole} onChange={(e) => setSignupRole(e.target.value)}>
-              <option value="PATIENT">Patient</option>
-              <option value="DOCTOR">Doctor</option>
+              <option value="patient">Patient</option>
+              <option value="doctor">Doctor</option>
             </select>
           </div>
 
@@ -106,11 +131,27 @@ const Signup = () => {
             <label>Contact</label>
             <input type="text" value={contact} onChange={(e) => setContact(e.target.value)} />
           </div>
-          <div className="input-group full-width">
-            <label>Address</label>
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
+          <div className="input-group">
+            <label>Street</label>
+            <input type="text" value={street} onChange={(e) => setStreet(e.target.value)} />
           </div>
-          <div className="input-group full-width">
+          <div className="input-group">
+            <label>City</label>
+            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} />
+          </div>
+          <div className="input-group">
+            <label>State</label>
+            <input type="text" value={state} onChange={(e) => setState(e.target.value)} />
+          </div>
+          <div className="input-group">
+            <label>Country</label>
+            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} />
+          </div>
+          <div className="input-group">
+            <label>Zipcode</label>
+            <input type="text" value={zipcode} onChange={(e) => setZipcode(e.target.value)} />
+          </div>
+          <div className="input-group">
             <label>Blood Group</label>
             <select value={bloodGroup} onChange={(e) => setBloodGroup(e.target.value)}>
               <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
