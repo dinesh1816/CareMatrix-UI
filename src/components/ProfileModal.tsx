@@ -5,8 +5,8 @@ import { X, Pencil } from "lucide-react";
 type User = {
   name: string;
   emailAddress: string;
-  id: string | number;
-  age: number;
+  id: string | number | null;
+  age: number | string;
   gender: string;
   dateOfBirth: string;
   mobileNumber: string;

@@ -14,13 +14,15 @@ type Appointment = {
 interface AppointmentsModalProps {
   title: string;
   onClose: () => void;
+  patientId: string | null;
+  doctorId : string | null;
 }
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const patientId = localStorage.getItem("userId");
 const ITEMS_PER_PAGE = 5;
 
-const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose }) => {
+const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, doctorId, patientId }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -28,12 +30,25 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose })
     const fetchAppointmentData = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
-        const res = await fetch(`${baseURL}/appointments/${patientId}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        let res;
+
+        if (doctorId != null) {
+          res = await fetch(`${baseURL}/appointments/doctor/${doctorId}`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } else if (patientId != null) {
+          res = await fetch(`${baseURL}/appointments/patientId/${patientId}`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } else {
+          throw new Error("Either doctorId or patientId must be provided.");
+        }
 
         if (!res.ok) throw new Error("Failed to fetch appointments");
 

@@ -16,6 +16,7 @@ import { UserCircle2, LogOut, Calendar, Video, Plus } from "lucide-react";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const patientId = localStorage.getItem("userId");
+console.log("patient id is", patientId, "localstorageid is", localStorage.getItem("userId"));
 
 type Appointment = {
   id: number;
@@ -118,8 +119,9 @@ const PatientDashboard = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch profile");
 
+      if (!res.ok) throw new Error("Failed to fetch profile");
+      
       const user = await res.json();
       setPatientProfile(user);
     } catch (err) {
@@ -386,6 +388,8 @@ const PatientDashboard = () => {
         <AppointmentsModal
           title="All Appointments"
           onClose={() => setShowAppointmentsModal(false)}
+          doctorId = {null}
+          patientId = {patientId}
         />
       )}
       {showAddInsuranceModal && (

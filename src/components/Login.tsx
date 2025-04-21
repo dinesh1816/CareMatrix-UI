@@ -23,17 +23,17 @@ const Login = () => {
       });
 
       const data = await response.json();
-      const { token, role, id, userName } = data;
+      const { token, role, id, username } = data;
 
       // Save token and user info to localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("role", role);
       localStorage.setItem("userId", id);
-      localStorage.setItem("userName", userName);
+      localStorage.setItem("userName", username);
       
       if(role === "patient") {
         navigate("/patient-dashboard")
-      } else if (role === "/doctor-dashbaord") {
+      } else if (role === "doctor") {
         navigate("doctor-dashboard")
       }
     } catch (error) {

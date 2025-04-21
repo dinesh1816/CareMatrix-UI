@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./DoctorDashboard.css";
 import AddAllergyModal from "./AddAllergyModal"; 
@@ -19,6 +19,7 @@ import AppointmentsModal from "./AppointmentsModal";
 import { Search, UserCircle2, LogOut, Plus, Video, Calendar } from "lucide-react";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
+const doctorId = localStorage.getItem("userId");
 
 type Appointment = {
   id: number;
@@ -61,28 +62,10 @@ type Surgery = {
   surgeryHospital: string;
 };
 
-const doctor = {
-  name: "Dr. John Smith",
-  emailAddress: "doctor@example.com",
-  id: "CMX-DOC-1001",
-  age: 40,
-  gender: "Male",
-  dateOfBirth: "1983-01-01",
-  mobileNumber: "+1 (555) 987-6543",
-  street: "spid",
-  city: "corpus christi",
-  state: "texas",
-  country: "USA",
-  zipcode: "78412",
-  bloodGroup: "A+",
-};
-
 const DoctorDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [showAppointmentScheduler, setShowAppointmentScheduler] = useState(false);
   const [showTelemedicineModal, setShowTelemedicineModal] = useState(false);
-  const [upcomingAppointments] = useState<Appointment[]>([]);
-  const [pastAppointments] = useState<Appointment[]>([]);
   const [allergies, setAllergies] = useState<Allergy[]>([]);
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [surgeries, setSurgeries] = useState<Surgery[]>([]);
@@ -107,6 +90,54 @@ const DoctorDashboard = () => {
   const [showAddPrescriptionModal, setShowAddPrescriptionModal] = useState(false);
   const [showAddSurgeryModal, setShowAddSurgeryModal] = useState(false);
 
+  const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
+  const [pastAppointments, setPastAppointments] = useState<Appointment[]>([]);
+
+  const [patientName, setPatientName] = useState("");
+  const [patientAge, setPatientAge] = useState("");
+  const [patientGender, setPatientGender] = useState("");
+  const [patientBloodGroup, setPatientBloodGroup] = useState("");
+  const [patientMobileNumber, setPatientMobileNumber] = useState("");
+  const [patientEmailAddress, setPatientEmailAddress] = useState("");
+  const [patientStreet, setPatientStreet] = useState("");
+  const [patientCity, setPatientCity] = useState("");
+  const [patientState, setPatientState] = useState("");
+  const [patientCountry, setPatientCountry] = useState("");
+  const [patientZipCode, setPatientZipCode] = useState("");
+  
+  const [doctorName, setDoctorName] = useState("");
+  const [doctorEmailAddress, setDoctorEmailAddress] = useState("");
+  const [doctorAge, setDoctorAge] = useState("");
+  const [doctorGender, setDoctorGender] = useState("");
+  const [doctorDOB, setDoctorDOB] = useState("");
+  const [doctorMobileNumber, setDoctorMobileNumber] = useState("");
+  const [doctorStreet, setDoctorStreet] = useState("");
+  const [doctorCity, setDoctorCity] = useState("");
+  const [doctorState, setDoctorState] = useState("");
+  const [doctorCountry, setDoctorCountry] = useState("");
+  const [doctorZipCode, setDoctorZipCode] = useState("");
+  const [doctorBloodGroup, setDoctorBloodGroup] = useState("");
+  const [doctorExperience, setDoctorExperience] = useState("");
+  const [doctorLicense, setDoctorLicense] = useState("");
+  const [doctorDepartment, setDoctorDepartment] = useState("");
+  const [doctorEducation, setDoctorEducation] = useState("");
+
+  const doctor = {
+    name: doctorName,
+    emailAddress: doctorEmailAddress,
+    id: doctorId,
+    age: doctorAge,
+    gender: doctorGender,
+    dateOfBirth: doctorDOB,
+    mobileNumber: doctorMobileNumber,
+    street: doctorStreet,
+    city: doctorCity,
+    state: doctorState,
+    country: doctorCountry,
+    zipcode: doctorZipCode,
+    bloodGroup: doctorBloodGroup,
+  };
+
   const [searchResult, setSearchResult] = useState<{
     name: string;
     id: number;
@@ -120,44 +151,50 @@ const DoctorDashboard = () => {
     surgeries: { name: string; date: string; hospital: string }[];
   } | null>(null);
 
-  const handleSearch = () => {
-    if (searchId === "2") {
-      setSearchResult({
-        name: "Jane Doe",
-        id: 2,
-        age: 28,
-        gender: "female",
-        bloodGroup: "O+",
-        conditions: [
-          { name: "Asthma", date: "2015-05-10", status: "Controlled" },
-          { name: "Seasonal Allergies", date: "2018-03-22", status: "Ongoing" },
-        ],
-        prescriptions: [
-          { medication: "Amoxicillin", dosage: "500mg", frequency: "Twice daily", instructions: "with water", prescribedDate: "2023-12-01" },
-          { medication: "Loratadine", dosage: "10mg", frequency: "Once daily", instructions: "empty stomach", prescribedDate: "2023-11-15" },
-        ],
-        allergies: ["Penicillin", "Peanuts", "Latex"],
-        insurance: {
-          provider: "HealthGuard Insurance",
-          policyNumber: "HG123456789",
-          expiryDate: "2024-12-31",
-          coverage: "Comprehensive",
+
+
+  const handleSearch = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/api/doctors/patients/${searchId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        surgeries: [
-          { name: "Appendectomy", date: "2020-03-15", hospital: "City General Hospital" },
-          { name: "Tonsillectomy", date: "2018-07-22", hospital: "Medical Center East" },
-        ],
       });
-    } else {
-      setSearchResult(null);
+  
+      if (!res.ok) throw new Error("Failed to fetch patient details");
+  
+      const data = await res.json(); // ✅ Parse response
+  
+      // ✅ Now assign values from `data`
+      setPatientName(data.name);
+      setPatientAge(data.age);
+      setPatientGender(data.gender);
+      setPatientBloodGroup(data.bloodGroup);
+      setPatientMobileNumber(data.mobileNumber);
+      setPatientEmailAddress(data.emailAddress);
+      setPatientStreet(data.street);
+      setPatientCity(data.city);
+      setPatientState(data.state);
+      setPatientCountry(data.country);
+      setPatientZipCode(data.zipcode);
+      setAllergies(data.allergies.slice(0,3));
+      setConditions(data.currentConditions.slice(0,3));
+      setLatestPrescriptions(data.currentPrescriptions.slice(0,3));
+      setSurgeries(data.surgeries.slice(0,3));
+      setLatestInsurance(data.insuranceInformations?.[0] || null); // If array
+    } catch (error) {
+      console.error("Error fetching patient data:", error);
     }
   };
+  
 
-  const handleAddAllergy = async (allergy: { allergyName: string; severity: string; diagnosedDate: string; notes?: string }) => {
+  const handleAddAllergy = async (allergy: { allergyName: string; severity: string; notes?: string }) => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/allergies/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/allergies`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -168,8 +205,6 @@ const DoctorDashboard = () => {
   
       if (!res.ok) throw new Error("Failed to add allergy");
   
-      const newAllergy = await res.json();
-      setAllergies((prev) => [...prev, newAllergy]);
     } catch (err) {
       console.error("Error adding allergy:", err);
     }
@@ -179,7 +214,7 @@ const DoctorDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/conditions/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/conditions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -189,9 +224,6 @@ const DoctorDashboard = () => {
       });
   
       if (!res.ok) throw new Error("Failed to add allergy");
-  
-      const newAllergy = await res.json();
-      setConditions((prev) => [...prev, newAllergy]);
     } catch (err) {
       console.error("Error adding allergy:", err);
     }
@@ -201,14 +233,13 @@ const DoctorDashboard = () => {
     medication: string;
     dosage: string;
     frequency: string;
-    instructions: string;
     prescribedDate: string;
     notes?: string;
   }) => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/prescriptions/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/prescriptions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -218,9 +249,6 @@ const DoctorDashboard = () => {
       });
   
       if (!res.ok) throw new Error("Failed to add prescription");
-  
-      const newPrescription = await res.json();
-      setLatestPrescriptions((prev) => [...prev, newPrescription]);
     } catch (err) {
       console.error("Error adding prescription:", err);
     }
@@ -241,24 +269,67 @@ const DoctorDashboard = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(prescription),
+        body: JSON.stringify({surgeryName: prescription.surgeryName, surgeryDate: prescription.surgeryDate, hospital: prescription.surgeryHospital }),
       });
   
       if (!res.ok) throw new Error("Failed to add prescription");
-  
-      const newSurgery = await res.json();
-      setSurgeries((prev) => [...prev, newSurgery]);
     } catch (err) {
       console.error("Error adding prescription:", err);
     }
   };
   
-  
+  const handleLogout = async () => {
+
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+
+    navigate("/");
+  };
+
+  const fetchDoctorDetails = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/patients/${doctorId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch profile");
+
+
+      const user = await res.json();
+      setDoctorName(user.name);
+      setDoctorEmailAddress(user.email);
+      setDoctorAge(user.age);
+      setDoctorMobileNumber(user.mobileNumber);
+      setDoctorDOB(user.dateOfBirth);
+      setDoctorGender(user.gender);
+      setDoctorState(user.street);
+      setDoctorCity(user.city);
+      setDoctorState(user.state);
+      setDoctorCountry(user.country);
+      setDoctorZipCode(user.zipcode);
+      setDoctorExperience(user.experience);
+      setDoctorLicense(user.LicenseNumber);
+      setDoctorDepartment(user.department);
+      setDoctorEducation(user.education);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchDoctorDetails();
+  }, []);
 
   return (
     <div className="dashboard-container">
       <div className="doctor-top-bar">
-        <h2>{doctor.name}</h2>
+        <h2>{doctorName}</h2>
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
           <Video />Telemedicine Consultation
         </button>
@@ -275,7 +346,7 @@ const DoctorDashboard = () => {
               onClose={() => setShowProfile(false)}
             />
           )}
-          <LogOut className="icon" onClick={() => navigate("/")} />
+          <LogOut className="icon" onClick={() => handleLogout()} />
         </div>
       </div>
       
@@ -366,8 +437,6 @@ const DoctorDashboard = () => {
                   <br />
                   Frequency: {pres.frequency}
                   <br />
-                  Instructions: {pres.instructions}
-                  <br />
                   Prescribed: {pres.prescribedDate}
                 </p>
               ))}
@@ -416,6 +485,8 @@ const DoctorDashboard = () => {
         <AppointmentsModal
           title="All Appointments"
           onClose={() => setShowAppointmentsModal(false)}
+          doctorId = {localStorage.getItem("userId")}
+          patientId = {null}
         />
       )}
 
@@ -452,3 +523,5 @@ const DoctorDashboard = () => {
 };
 
 export default DoctorDashboard;
+
+
