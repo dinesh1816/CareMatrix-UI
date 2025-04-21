@@ -333,11 +333,11 @@ const DoctorDashboard = () => {
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
           <Video />Telemedicine Consultation
         </button>
-        {showTelemedicineModal && <TelemedicineModal onClose={() => setShowTelemedicineModal(false)} />}
+        {showTelemedicineModal && <TelemedicineModal onClose={() => setShowTelemedicineModal(false)} role={localStorage.getItem("role")}/>}
         <button onClick={() => setShowAppointmentScheduler(true)} className="appointment-btn">
           <Calendar />Schedule Appointment
         </button>
-        {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)} />}
+        {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)}/>}
         <div className="icons">
           <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
           {showProfile && (

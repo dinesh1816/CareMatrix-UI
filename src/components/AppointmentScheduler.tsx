@@ -1,106 +1,157 @@
-import React, { useState } from "react";
-import "./AppointmentScheduler.css";
+// AppointmentScheduler.tsx
+import React, { useEffect, useState } from 'react';
+import './AppointmentScheduler.css';
 
-const AppointmentScheduler = ({ onClose }: { onClose: () => void }) => {
-  const [selectedDoctor, setSelectedDoctor] = useState("Dr. John Smith");
-  const [selectedDate, setSelectedDate] = useState("Thursday, March 27th, 2025");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [reason, setReason] = useState("");
+interface AppointmentSchedulerProps {
+  onClose: () => void;
+}
+
+type Doctor = {
+  id: string;
+  name: string;
+  department: string;
+};
+
+type Patient = {
+  id: string;
+  name: string;
+  age: number;
+};
+
+const baseURL = process.env.REACT_APP_API_BASE_URL;
+
+const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({ onClose }) => {
+  const userRole = localStorage.getItem("role");
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [reason, setReason] = useState('');
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
+  const [selectedPatientId, setSelectedPatientId] = useState('');
 
   const timeSlots = [
-    { time: "9:00 AM", disabled: true },
-    { time: "10:00 AM", disabled: false },
-    { time: "11:00 AM", disabled: false },
-    { time: "12:00 PM", disabled: false },
-    { time: "1:00 PM", disabled: true },
-    { time: "2:00 PM", disabled: false },
-    { time: "3:00 PM", disabled: true },
-    { time: "4:00 PM", disabled: true }
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
   ];
 
-  const handleSchedule = () => {
-    console.log({
-      doctor: selectedDoctor,
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const token = localStorage.getItem("jwtToken");
+      const endpoint = userRole === "patient" ? "/doctors" : "/patients";
+      const response = await fetch(`${baseURL}${endpoint}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (userRole === "patient") setDoctors(data);
+      else setPatients(data);
+    };
+
+    fetchUsers();
+  }, [userRole]);
+
+  const handleSchedule = async () => {
+    const token = localStorage.getItem("jwtToken");
+
+    const payload = {
       date: selectedDate,
       time: selectedTime,
-      reason
-    });
-    onClose();
+      reason,
+      doctorId: userRole === "patient" ? selectedDoctorId : localStorage.getItem("userId"),
+      patientId: userRole === "doctor" ? selectedPatientId : localStorage.getItem("userId"),
+    };
+
+    const who = userRole === 'patient' ? `Doctor ID: ${selectedDoctorId}` : `Patient ID: ${selectedPatientId}`;
+    alert(`Consultation scheduled with ${who} on ${selectedDate} at ${selectedTime} for: ${reason}`);
+    let res;
+    try {
+      if (userRole === "doctor") {
+        res = await fetch(`${baseURL}/appointments?doctorId=${localStorage.getItem("userId")}&paitentId=${selectedPatientId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
+        });
+      } else if (userRole === "patient") {
+        res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}$doctorId=${selectedDoctorId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
+        });
+      } else {
+        throw new Error("Either doctorId or patientId must be provided.");
+      }
+    } catch (err) {
+      console.error("Error scheuling appointment:", err);
+    }
   };
 
   return (
     <div className="modal-overlay">
-      <div className="appointment-modal">
+      <div className="telemedicine-modal">
         <div className="modal-header">
-          <h2>Schedule Appointment</h2>
-          <span className="close-btn" onClick={onClose}>×</span>
+          <div className="modal-title">
+            <span className="icon">📅</span>
+            <h2>Schedule Appointment</h2>
+          </div>
+          <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <div className="modal-body">
-          <div className="left-section">
-            <label className="section-title">Select Doctor</label>
-            <div className="doctor-card">
-              <span className="doctor-icon">👤</span>
-              <div>
-                <div className="doctor-name">Dr. John Smith</div>
-                <div className="doctor-specialty">Cardiology</div>
-              </div>
+          <div className="form-grid">
+            <div className="left-section">
+              <label>{userRole === "patient" ? "Select Doctor" : "Select Patient"}</label>
+              <select
+                value={userRole === "patient" ? selectedDoctorId : selectedPatientId}
+                onChange={(e) => userRole === "patient" ? setSelectedDoctorId(e.target.value) : setSelectedPatientId(e.target.value)}
+              >
+                <option value="">-- Select --</option>
+                {(userRole === "patient" ? doctors : patients).map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <label className="section-title">Select Time</label>
-            <div className="time-grid">
-              {timeSlots.map(({ time, disabled }) => (
-                <button
-                  key={time}
-                  disabled={disabled}
-                  className={`time-slot ${selectedTime === time ? "selected" : ""}`}
-                  onClick={() => setSelectedTime(time)}
-                >
-                  🕒 {time}
-                </button>
-              ))}
+            <div className="right-section">
+              <label>Select Date</label>
+              <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+
+              <label>Select Time</label>
+              <div className="time-grid">
+                {timeSlots.map((slot, index) => (
+                  <button
+                    key={index}
+                    className={`time-btn ${selectedTime === slot ? 'selected' : ''}`}
+                    onClick={() => setSelectedTime(slot)}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="right-section">
-            <label className="section-title">Select Date</label>
-            <div className="date-grid">
-              {["Thu 27", "Fri 28", "Sat 29", "Sun 30", "Mon 31", "Tue 1", "Wed 2"].map((d, i) => (
-                <div
-                  key={i}
-                  className={`date-box ${i === 0 ? "active" : ""}`}
-                  onClick={() => setSelectedDate(`Thursday, March 27th, 2025`)}
-                >
-                  {d}
-                </div>
-              ))}
-            </div>
-
-            <label className="section-title">Reason for Visit</label>
+          <div className="textarea-container">
+            <label>Reason for Appointment</label>
             <textarea
-              placeholder="Please describe your reason for the appointment..."
+              placeholder="Please describe the reason for the appointment..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
-
-            <div className="appointment-summary">
-              <label className="section-title">Appointment Summary</label>
-              <div className="summary-card">
-                📅 {selectedDate}
-              </div>
-            </div>
           </div>
         </div>
 
         <div className="modal-footer">
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button
-            className="schedule-btn"
-            disabled={!selectedTime || !reason}
-            onClick={handleSchedule}
-          >
-            Schedule Appointment
-          </button>
+          <button className="start-btn" onClick={handleSchedule}>Confirm Appointment</button>
         </div>
       </div>
     </div>
