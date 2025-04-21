@@ -1,28 +1,65 @@
-// src/components/InsuranceModal.tsx
-
-import React, { useState } from "react";
-import "./MedicalInfoModal.css";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import "./MedicalInfoModal.css";
 
 type Insurance = {
   providerName: string;
   policyNumber: string;
   expireDate: string;
   coverage: string;
-  updatedAt: string;
 };
 
-type Props = {
-  insuranceList: Insurance[];
+interface InsuranceModalProps {
+  userId: string | null;
   onClose: () => void;
-};
+}
 
-const ITEMS_PER_PAGE = 5;
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 
-const InsuranceModal: React.FC<Props> = ({ insuranceList, onClose }) => {
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil((insuranceList?.length || 0) / ITEMS_PER_PAGE);
-  const paginated = insuranceList?.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE) || [];
+const InsuranceModal: React.FC<InsuranceModalProps> = ({ userId, onClose }) => {
+  const [insurances, setInsurances] = useState<Insurance[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
+  const fetchInsurances = async (page: number, size: number) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+
+      const response = await fetch(`${baseURL}/patient/${userId}/insurance?page=${page}&size=${size}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch insurances");
+
+      const data = await response.json();
+      setInsurances(data.content); // adjust if your backend sends a different structure
+      setTotalPages(data.totalPages);
+      setTotalRecords(data.totalElements);
+    } catch (err) {
+      console.error("Error fetching insurances:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchInsurances(currentPage, pageSize);
+  }, [currentPage, pageSize]);
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   return (
     <div className="modal-overlay">
@@ -31,44 +68,43 @@ const InsuranceModal: React.FC<Props> = ({ insuranceList, onClose }) => {
           <h2>Insurance Information</h2>
           <X className="modal-close-btn" onClick={onClose} />
         </div>
+
         <table className="modal-table">
           <thead>
             <tr>
               <th>Provider</th>
               <th>Policy Number</th>
-              <th>Expire Date</th>
+              <th>Expiry Date</th>
               <th>Coverage</th>
-              <th>Updated On</th>
             </tr>
           </thead>
           <tbody>
-            {paginated.length > 0 ? (
-              paginated.map((item, idx) => (
-                <tr key={idx}>
+            {insurances.length > 0 ? (
+              insurances.map((item, index) => (
+                <tr key={index}>
                   <td>{item.providerName}</td>
                   <td>{item.policyNumber}</td>
-                  <td>{item.expireDate}</td>
+                  <td>{new Date(item.expireDate).toLocaleDateString()}</td>
                   <td>{item.coverage}</td>
-                  <td>{new Date(item.updatedAt).toLocaleDateString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center">
-                  No insurance records found.
-                </td>
+                <td colSpan={5} className="text-center">No insurance records found.</td>
               </tr>
             )}
           </tbody>
         </table>
+
         <div className="modal-pagination">
-          <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
-            Previous
-          </button>
-          <span>{page} of {totalPages}</span>
-          <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>
-            Next
-          </button>
+          <button onClick={handlePrev} disabled={currentPage === 1}>Previous</button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button onClick={handleNext} disabled={currentPage === totalPages}>Next</button>
+          <select value={pageSize} onChange={handlePageSizeChange}>
+            <option value={3}>3 / page</option>
+            <option value={5}>5 / page</option>
+            <option value={10}>10 / page</option>
+          </select> 
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import "./MedicalInfoModal.css"; // Reuse shared modal CSS
+import "./MedicalInfoModal.css";
 
 type Allergy = {
   allergyName: string;
@@ -8,18 +8,42 @@ type Allergy = {
 };
 
 interface AllergyModalProps {
-  allergies: Allergy[];
+  userId: string | null;
   onClose: () => void;
 }
 
-const ITEMS_PER_PAGE = 5;
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 
-const AllergyModal: React.FC<AllergyModalProps> = ({ allergies, onClose }) => {
+const AllergyModal: React.FC<AllergyModalProps> = ({ userId, onClose }) => {
+  const [allergies, setAllergies] = useState<Allergy[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0); // total elements
 
-  const totalPages = Math.ceil(allergies.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = allergies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const fetchAllergies = async (page: number, size: number) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await fetch(`${baseURL}/patient/${userId}/allergies?page=${page}&size=${size}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch allergies");
+
+      const data = await response.json();
+      setAllergies(data.content);
+      setTotalPages(data.totalPages);
+      setTotalRecords(data.totalElements);
+    } catch (err) {
+      console.error("Error fetching allergies:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllergies(currentPage, pageSize);
+  }, [currentPage, pageSize]);
 
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
@@ -29,13 +53,20 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ allergies, onClose }) => {
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSize = Number(e.target.value);
+    setPageSize(newSize);
+    setCurrentPage(1); // reset to page 1
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal-container">
-      <div className="modal-header">
+        <div className="modal-header">
           <h2>Allergies</h2>
           <X className="modal-close-btn" onClick={onClose} />
         </div>
+
         <table className="modal-table">
           <thead>
             <tr>
@@ -44,8 +75,8 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ allergies, onClose }) => {
             </tr>
           </thead>
           <tbody>
-            {currentItems.length > 0 ? (
-              currentItems.map((item, index) => (
+            {allergies.length > 0 ? (
+              allergies.map((item, index) => (
                 <tr key={index}>
                   <td>{item.allergyName}</td>
                   <td>{item.severity}</td>
@@ -53,23 +84,25 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ allergies, onClose }) => {
               ))
             ) : (
               <tr>
-                <td colSpan={2} className="text-center">
-                  No allergy records found.
-                </td>
+                <td colSpan={2} className="text-center">No allergy records found.</td>
               </tr>
             )}
           </tbody>
         </table>
+
         <div className="modal-pagination">
           <button onClick={handlePrev} disabled={currentPage === 1}>
             Previous
           </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
+          <span>Page {currentPage} of {totalPages}</span>
           <button onClick={handleNext} disabled={currentPage === totalPages}>
             Next
           </button>
+          <select value={pageSize} onChange={handlePageSizeChange}>
+            <option value={3}>3 / page</option>
+            <option value={5}>5 / page</option>
+            <option value={10}>10 / page</option>
+          </select> 
         </div>
       </div>
     </div>

@@ -14,8 +14,9 @@ import AppointmentsModal from "./AppointmentsModal";
 import AddInsuranceModal from "./AddInsuranceModal";
 import { UserCircle2, LogOut, Calendar, Video, Plus } from "lucide-react";
 
-const patientId = 2;
 const baseURL = process.env.REACT_APP_API_BASE_URL;
+const patientId = localStorage.getItem("userId");
+console.log("patient id is", patientId, "localstorageid is", localStorage.getItem("userId"));
 
 type Appointment = {
   id: number;
@@ -49,7 +50,6 @@ type Insurance = {
   policyNumber: string;
   expireDate: string;
   coverage: string;
-  updatedAt: string;
 };
 
 type Surgery = {
@@ -59,14 +59,18 @@ type Surgery = {
 };
 
 type PatientProfile = {
-  username: string;
-  email: string;
-  uniqueId: string | number;
+  name: string;
+  emailAddress: string;
+  id: string | number;
   age: number;
   gender: string;
   dateOfBirth: string;
-  contact: string;
-  address: string;
+  mobileNumber: string;
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: string;
   bloodGroup: string;
 };
 
@@ -96,26 +100,13 @@ const PatientDashboard = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("jwtToken");
 
-      await fetch(`${baseURL}/auth/logout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      });
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
 
-      localStorage.removeItem("jwtToken");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userId");
-
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      alert("Logout failed. Try again.");
-    }
+    navigate("/");
   };
 
   const fetchPatientProfile = async () => {
@@ -128,22 +119,12 @@ const PatientDashboard = () => {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch profile");
 
+      if (!res.ok) throw new Error("Failed to fetch profile");
+      
       const user = await res.json();
       setPatientProfile(user);
     } catch (err) {
-      setPatientProfile({
-        username: "dinesh",
-        email: "dinesh@example.com",
-        uniqueId: 2,
-        age: 25,
-        gender: "male",
-        dateOfBirth: "july 21 2000",
-        contact: "9452686045",
-        address: "corpus christi",
-        bloodGroup: "o+"
-      });
       console.error("Error fetching profile:", err);
     }
   };
@@ -171,7 +152,7 @@ const PatientDashboard = () => {
   const fetchPatientAllergies = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/allergies/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/allergies?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -190,7 +171,7 @@ const PatientDashboard = () => {
   const fetchPatientInsurance = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/insurance/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/insurance?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -209,7 +190,7 @@ const PatientDashboard = () => {
   const fetchPatientCondition = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/conditions/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/conditions/${patientId}?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -225,10 +206,10 @@ const PatientDashboard = () => {
     }
   };
 
-  const fetchPatientPriscription = async () => {
+  const fetchPatientPrescription = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/prescriptions/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/prescriptions?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -244,20 +225,40 @@ const PatientDashboard = () => {
     }
   };
 
+  const fetchPatientSurgeries = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/patient/${patientId}/surgeries?page=0&size=3`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch surgeries");
+
+      const data = await res.json();
+      setSurgeries(data || []);
+    } catch (err) {
+      console.error("Error fetching surgeries:", err);
+    }
+  }
+
   const fetchDashboardData = async () => {
     fetchPatientProfile();
     fetchAppointments();
     fetchPatientAllergies();
     fetchPatientInsurance();
     fetchPatientCondition();
-    fetchPatientPriscription();
+    fetchPatientPrescription();
+    fetchPatientSurgeries();
   };
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
   
-  const handleAddInsurance = async (allergy: { providerName: string; policyNumber: string; expireDate: string; coverage: string; updateAt: string; notes?: string }) => {
+  const handleAddInsurance = async (insurance: { providerName: string; policyNumber: string; expireDate: string; coverage: string; notes?: string }) => {
     try {
       const token = localStorage.getItem("jwtToken");
   
@@ -267,7 +268,7 @@ const PatientDashboard = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(allergy),
+        body: JSON.stringify(insurance),
       });
   
       if (!res.ok) throw new Error("Failed to add allergy");
@@ -282,15 +283,15 @@ const PatientDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="top-bar">
-        <h1>Welcome, {patientProfile?.username || "Patient"}</h1>
+        <h1>Welcome, {patientProfile?.name || "Patient"}</h1>
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
           <Video />Telemedicine Consultation
         </button>
-        {showTelemedicineModal && <TelemedicineModal onClose={() => setShowTelemedicineModal(false)} />}
+        {showTelemedicineModal && <TelemedicineModal onClose={() => setShowTelemedicineModal(false)} role={localStorage.getItem("role")} />}
         <button onClick={() => setShowAppointmentScheduler(true)} className="appointment-btn">
           <Calendar />Schedule Appointment
         </button>
-        {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)} />}
+        {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)}/>}
         <div className="icons">
           <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
           {showProfile && patientProfile && <ProfileModal user={patientProfile} onClose={() => setShowProfile(false)} />}
@@ -304,7 +305,9 @@ const PatientDashboard = () => {
 
       <div className="patient-grid-layout">
         <div className="card wide-card">
-          <h2 onClick={() => setShowAllergyModal(true)}>Allergies</h2>
+          <div className="card-header">
+            <h2 onClick={() => setShowAllergyModal(true)}>Allergies</h2>
+          </div>
           <div className="allergy-list">
             {allergies.length ? (
               allergies.map((a, i) => <p key={i}>{a.allergyName} – Severity: {a.severity}</p>)
@@ -339,7 +342,6 @@ const PatientDashboard = () => {
               <>
                 <p>{latestInsurance.providerName}</p>
                 <p>Policy Number: {latestInsurance.policyNumber}</p>
-                <p>Updated: {new Date(latestInsurance.updatedAt).toLocaleDateString()}</p>
               </>
             ) : (
               <p className="text-gray-600">No insurance details available</p>
@@ -363,7 +365,9 @@ const PatientDashboard = () => {
         </div>
 
         <div className="card wide-card">
-          <h2 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h2>
+          <div className="card-header">
+            <h2 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h2>
+          </div>
           {latestPrescriptions.length ? (
             latestPrescriptions.map((p, i) => (
               <p key={i}><strong>{p.medication}</strong><br />Dosage: {p.dosage}<br />Instructions: {p.instructions}<br />Prescribed on: {new Date(p.prescribedDate).toLocaleDateString()}</p>
@@ -374,17 +378,18 @@ const PatientDashboard = () => {
         </div>
       </div>
 
-      {showAllergyModal && <AllergyModal allergies={allergies} onClose={() => setShowAllergyModal(false)} />}
-      {showConditionModal && <ConditionModal conditions={conditions} onClose={() => setShowConditionModal(false)} />}
-      {showInsuranceModal && (<InsuranceModal insuranceList={latestInsurance ? [latestInsurance] : []} onClose={() => setShowInsuranceModal(false)}/>)}
+      {showAllergyModal && <AllergyModal userId={patientId} onClose={() => setShowAllergyModal(false)} />}
+      {showConditionModal && <ConditionModal userId={patientId} onClose={() => setShowConditionModal(false)} />}
+      {showInsuranceModal && (<InsuranceModal userId={patientId} onClose={() => setShowInsuranceModal(false)}/>)}
 
-      {showPrescriptionModal && <PrescriptionModal prescriptions={latestPrescriptions} onClose={() => setShowPrescriptionModal(false)} />}
-      {showSurgeryModal && <SurgeryModal surgeries={surgeries} onClose={() => setShowSurgeryModal(false)} />}
+      {showPrescriptionModal && <PrescriptionModal userId={patientId} onClose={() => setShowPrescriptionModal(false)} />}
+      {showSurgeryModal && <SurgeryModal userId={patientId} onClose={() => setShowSurgeryModal(false)} />}
       {showAppointmentsModal && (
         <AppointmentsModal
-          appointments={[...upcomingAppointments, ...pastAppointments]}
           title="All Appointments"
           onClose={() => setShowAppointmentsModal(false)}
+          doctorId = {null}
+          patientId = {patientId}
         />
       )}
       {showAddInsuranceModal && (

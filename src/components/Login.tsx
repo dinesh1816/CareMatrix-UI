@@ -10,52 +10,34 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    const loginRole = "doctor";
     try {
       const response = await // Example with fetch
-      fetch("http://localhost:8000/api/auth/login", {
+      fetch("http://localhost:8080/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         credentials: "include", // ✅ Required to match allowCredentials=true
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ username: email, password, role: loginRole })
       });
-      
-
-      // if (!response.ok) {
-      //   // throw new Error("Invalid credentials");
-      // }
 
       const data = await response.json();
-      const { token, role, id } = data;
+      const { token, role, id, username } = data;
 
       // Save token and user info to localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("role", role);
       localStorage.setItem("userId", id);
-
-      // Navigate based on role
-      if (role === "DOCTOR") {
-        navigate("/doctor-dashboard");
-      } else if (role === "PATIENT") {
-        navigate("/patient-dashboard");
-      } else if (role === "ADMIN") {
-        navigate("/admin")
-      }else {
-        alert("Unknown user role");
-      }
-
-    } catch (error) {
-      // alert("Login failed: ");
-      console.log("inside login error");
-      if(email === "admin@example.com" && password === "admin123") {
-        navigate("/admin-dashboard")
-      } else if (email === "patient@example.com" && password === "patient123") {
+      localStorage.setItem("userName", username);
+      
+      if(role === "patient") {
         navigate("/patient-dashboard")
-      } else if (email === "doctor@example.com" && password === "doctor123") {
-        navigate("/doctor-dashboard")
+      } else if (role === "doctor") {
+        navigate("doctor-dashboard")
       }
+    } catch (error) {
+      alert("Login failed: ");
     }
   };
 
