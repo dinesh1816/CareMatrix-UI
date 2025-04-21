@@ -4,6 +4,7 @@ import { Stethoscope } from 'lucide-react';
 import "./Login.css";
 
 const Login = () => {
+  const loginURL = process.env.REACT_APP_LOGIN_API_URL || "";
   const [enterUsername, setEnterUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const Login = () => {
     const loginRole = "doctor";
     try {
       const response = await // Example with fetch
-      fetch("http://localhost:8080/login", {
+      fetch(loginURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

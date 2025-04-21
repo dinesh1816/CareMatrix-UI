@@ -4,6 +4,8 @@ import { Stethoscope } from "lucide-react";
 import "./Signup.css";
 
 const Signup = () => {
+  const signupURL = process.env.REACT_APP_SIGNUP_API_URL || "";
+
   const [signupRole, setSignupRole] = useState("PATIENT");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -60,7 +62,7 @@ const Signup = () => {
         department: "",
         education: ""
       };
-      const response = await fetch("http://localhost:8080/register", {
+      const response = await fetch(signupURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
