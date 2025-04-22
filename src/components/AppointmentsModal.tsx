@@ -16,16 +16,16 @@ interface AppointmentsModalProps {
   title: string;
   onClose: () => void;
   patientId: string | null;
-  doctorId : string | null;
+  doctorId: string | null;
 }
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
-const patientId = localStorage.getItem("userId");
 const ITEMS_PER_PAGE = 5;
 
 const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, doctorId, patientId }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1); // Track total pages
 
   useEffect(() => {
     const fetchAppointmentData = async () => {
@@ -34,14 +34,14 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
         let res;
 
         if (doctorId != null) {
-          res = await fetch(`${baseURL}/appointments/doctor/${doctorId}/paginated`, {
+          res = await fetch(`${baseURL}/appointments/doctor/${doctorId}/paginated?page=${currentPage}&size=${ITEMS_PER_PAGE}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
         } else if (patientId != null) {
-          res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated`, {
+          res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated?page=${currentPage}&size=${ITEMS_PER_PAGE}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -54,18 +54,23 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
         if (!res.ok) throw new Error("Failed to fetch appointments");
 
         const appointmentsList = await res.json();
-        setAppointments(appointmentsList);
+        setAppointments(appointmentsList.content); // Set appointment data
+        setTotalPages(appointmentsList.totalPages); // Set total pages
       } catch (err) {
         console.error("Error fetching appointments:", err);
       }
     };
 
     fetchAppointmentData();
-  }, []);
+  }, [currentPage, doctorId, patientId]); // Fetch data when page changes
 
-  const totalPages = Math.ceil(appointments.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = appointments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
 
   return (
     <div className="modal-overlay">
@@ -74,19 +79,20 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           <h2>{title}</h2>
           <X className="modal-close-btn" onClick={onClose} />
         </div>
+
         <table className="modal-table">
           <thead>
             <tr>
               <th>Date</th>
               <th>Reason</th>
               <th>Status</th>
-              <th>{(localStorage.getItem("role") === "patient") ? "doctor" : "patient"}</th>
+              <th>{(localStorage.getItem("role") === "patient") ? "Doctor" : "Patient"}</th>
               <th>Meeting Link</th>
             </tr>
           </thead>
           <tbody>
-            {currentItems.length > 0 ? (
-              currentItems.map((a, i) => (
+            {appointments.length > 0 ? (
+              appointments.map((a, i) => (
                 <tr key={i}>
                   <td>{new Date(a.appointmentDate).toLocaleDateString()}</td>
                   <td>{a.reason}</td>
@@ -103,12 +109,13 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
             )}
           </tbody>
         </table>
+
         <div className="modal-pagination">
-          <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+          <button onClick={handlePrev} disabled={currentPage === 1}>
             Previous
           </button>
           <span>Page {currentPage} of {totalPages}</span>
-          <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+          <button onClick={handleNext} disabled={currentPage === totalPages}>
             Next
           </button>
         </div>
