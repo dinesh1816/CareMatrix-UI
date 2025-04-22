@@ -27,7 +27,7 @@ const AppointmentsSection: React.FC<Props> = ({
         {upcomingAppointments.length ? (
           upcomingAppointments.map((a) => (
             <div key={a.reason} className="appointment-card">
-              <p className="patient-name">{a.time}</p>
+              {/* <p className="patient-name">{a.time}</p> */}
               <p>
                 <Calendar className="icon" size={16} />
                 {new Date(a.date).toLocaleDateString()}
@@ -62,7 +62,7 @@ const AppointmentsSection: React.FC<Props> = ({
         {pastAppointments.length ? (
           pastAppointments.map((a) => (
             <div key={a.reason} className="appointment-card">
-              <p className="patient-name">{a.time}</p>
+              {/* <p className="patient-name">{a.time}</p> */}
               <p>
                 <Calendar className="icon" size={16} />
                 {new Date(a.date).toLocaleDateString()}

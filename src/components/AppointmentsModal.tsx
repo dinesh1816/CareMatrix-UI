@@ -99,7 +99,15 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
                   {/* <td>{a.status}</td>
                   <td>{a.patientName}</td>
                   <td>{localStorage.getItem("role") === "patient" ? a.doctorName : a.patientName}</td> */}
-                  <td>{a.meetingLink}</td>
+                  <td>
+                  {a.meetingLink ? (
+                    <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
+                      Join Meeting
+                    </a>
+                  ) : (
+                    "No link"
+                  )}
+                  </td>
                 </tr>
               ))
             ) : (
