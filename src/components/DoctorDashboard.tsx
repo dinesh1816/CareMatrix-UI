@@ -358,7 +358,7 @@ const DoctorDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="doctor-top-bar">
-        <h2>{doctorName}</h2>
+        <h2>Welcome Dr. {doctorName}</h2>
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
           <Video />Telemedicine Consultation
         </button>
