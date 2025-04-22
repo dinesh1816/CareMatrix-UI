@@ -86,7 +86,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
           body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
         });
       } else if (role === "patient") {
-        res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}$doctorId=${selectedDoctorId}`, {
+        res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}&doctorId=${selectedDoctorId}`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -36,9 +36,10 @@ const InsuranceModal: React.FC<InsuranceModalProps> = ({ userId, onClose }) => {
       if (!response.ok) throw new Error("Failed to fetch insurances");
 
       const data = await response.json();
-      setInsurances(data.content); // adjust if your backend sends a different structure
-      setTotalPages(data.totalPages);
-      setTotalRecords(data.totalElements);
+      setInsurances(data.content || []); // adjust if your backend sends a different structure
+      setTotalPages(data.totalPages || 1);
+      setTotalRecords(data.totalElements || 0);
+      console.log("insurances are", insurances);
     } catch (err) {
       console.error("Error fetching insurances:", err);
     }

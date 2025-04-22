@@ -25,7 +25,7 @@ const SurgeryModal: React.FC<SurgeryModalProps> = ({ userId, onClose }) => {
   const fetchSurgeries = async (page: number, size: number) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/${userId}/surgeries?page=${page}&size=${size}`, {
+      const res = await fetch(`${baseURL}/patients/${userId}/surgeries?page=${page-1}&size=${size}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -165,7 +165,7 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch allergies");
 
       const data = await res.json();
-      setAllergies(data || []);
+      setAllergies(data.content.slice(0, 3) || []);
     } catch (err) {
       console.error("Error fetching allergies:", err);
     }
@@ -184,7 +184,7 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch insurance");
 
       const data = await res.json();
-      setLatestInsurance(data || null);
+      setLatestInsurance(data[0] || null);
     } catch (err) {
       console.error("Error fetching insurance:", err);
     }
@@ -203,7 +203,7 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch conditions");
 
       const data = await res.json();
-      setConditions(data || []);
+      setConditions(data.content.slice(0,3) || []);
     } catch (err) {
       console.error("Error fetching conditions:", err);
     }
@@ -222,7 +222,7 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch prescriptions");
 
       const data = await res.json();
-      setLatestPrescriptions(data || []);
+      setLatestPrescriptions(data.content.slice(0,3) || []);
     } catch (err) {
       console.error("Error fetching prescriptions:", err);
     }
@@ -241,7 +241,7 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch surgeries");
 
       const data = await res.json();
-      setSurgeries(data || []);
+      setSurgeries(data.content.slice(0,3) || []);
     } catch (err) {
       console.error("Error fetching surgeries:", err);
     }
@@ -313,7 +313,7 @@ const PatientDashboard = () => {
           </div>
           <div className="allergy-list">
             {allergies.length ? (
-              allergies.map((a, i) => <p key={i}>{a.allergyName} – Severity: {a.severity}</p>)
+              allergies.map((a, i) => <p key={i}>{a.allergyName}</p>)
             ) : (
               <p className="text-gray-600">No known allergies</p>
             )}
