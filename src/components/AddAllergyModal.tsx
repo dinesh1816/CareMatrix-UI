@@ -4,8 +4,6 @@ import { X } from "lucide-react";
 
 interface Allergy {
   allergyName: string;
-  severity: string;
-  diagnosedDate: string;
   notes?: string;
 }
 
@@ -26,8 +24,6 @@ const AddAllergyModal: React.FC<Props> = ({ onClose, onAdd }) => {
 
     onAdd({
       allergyName,
-      severity,
-      diagnosedDate,
       notes: notes || undefined,
     });
 

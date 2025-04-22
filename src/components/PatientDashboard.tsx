@@ -133,7 +133,7 @@ const PatientDashboard = () => {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/appointments/patient/${patientId}/latest-upcoming`, {
+      const res = await fetch(`${baseURL}/appointments/patients/${patientId}/latest-upcoming`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,7 +153,7 @@ const PatientDashboard = () => {
   const fetchPatientAllergies = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/${patientId}/allergies?page=0&size=3`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/allergies?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -172,7 +172,7 @@ const PatientDashboard = () => {
   const fetchPatientInsurance = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/${patientId}/insurance?page=0&size=3`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/insurance?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -191,7 +191,7 @@ const PatientDashboard = () => {
   const fetchPatientCondition = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/${patientId}/conditions?page=0&size=3`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/conditions?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ const PatientDashboard = () => {
   const fetchPatientPrescription = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/${patientId}/prescriptions?page=0&size=3`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/prescriptions?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -229,7 +229,7 @@ const PatientDashboard = () => {
   const fetchPatientSurgeries = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/${patientId}/surgeries?page=0&size=3`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/surgeries?page=0&size=3`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -263,7 +263,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/${patientId}/insurance`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/insurance`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -31,7 +31,7 @@ type Appointment = {
 
 type Allergy = {
   allergyName: string;
-  severity: string;
+  notes: string;
 };
 
 type Condition = {
@@ -137,7 +137,7 @@ const DoctorDashboard = () => {
     zipcode: doctorZipCode,
     bloodGroup: doctorBloodGroup,
   };
-
+  const [gotSearchData, setGotSearchData] = useState(false);
   const [searchResult, setSearchResult] = useState<{
     name: string;
     id: number;
@@ -152,24 +152,25 @@ const DoctorDashboard = () => {
   } | null>(null);
 
 
-
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/api/doctors/patients/${searchId}`, {
+      const res = await fetch(`${baseURL}/doctors/patients/${searchId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: "include"
       });
   
       if (!res.ok) throw new Error("Failed to fetch patient details");
   
       const data = await res.json(); // ✅ Parse response
-  
+      console.log("inside handle search");
       // ✅ Now assign values from `data`
       setPatientName(data.name);
       setPatientAge(data.age);
+      setPatientId(data.id);
       setPatientGender(data.gender);
       setPatientBloodGroup(data.bloodGroup);
       setPatientMobileNumber(data.mobileNumber);
@@ -184,6 +185,8 @@ const DoctorDashboard = () => {
       setLatestPrescriptions(data.currentPrescriptions.slice(0,3));
       setSurgeries(data.surgeries.slice(0,3));
       setLatestInsurance(data.insuranceInformations?.[0] || null); // If array
+      setGotSearchData(true);
+      console.log("patient data", patientName, allergies);
     } catch (error) {
       console.error("Error fetching patient data:", error);
     }
@@ -210,11 +213,11 @@ const DoctorDashboard = () => {
   };
   
 
-  const handleAddAllergy = async (allergy: { allergyName: string; severity: string; notes?: string }) => {
+  const handleAddAllergy = async (allergy: { allergyName: string; notes?: string }) => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/${patientId}/allergies`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/allergies`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -234,7 +237,7 @@ const DoctorDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/${patientId}/conditions`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/conditions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -259,7 +262,7 @@ const DoctorDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/${patientId}/prescriptions`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/prescriptions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -283,7 +286,7 @@ const DoctorDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/${patientId}/surgeries`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/surgeries`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -399,7 +402,7 @@ const DoctorDashboard = () => {
         </div>
       </div>
 
-      {searchResult && (
+      {gotSearchData && (
         <div className="patient-records">
           <div className="patient-record-header">
             <h3>Patient Records</h3>
@@ -413,11 +416,11 @@ const DoctorDashboard = () => {
           <div className="grid-layout">
             <div className="card">
               <h4>Patient Information</h4>
-              <p>Name: {searchResult.name}</p>
-              <p>ID: {searchResult.id}</p>
-              <p>Age: {searchResult.age}</p>
-              <p>Gender: {searchResult.gender}</p>
-              <p>Blood Group: {searchResult.bloodGroup}</p>
+              <p>Name: {patientName}</p>
+              <p>ID: {patientId}</p>
+              <p>Age: {patientAge}</p>
+              <p>Gender: {patientGender}</p>
+              <p>Blood Group: {patientBloodGroup}</p>
             </div>
 
             <div className="card">
@@ -425,9 +428,9 @@ const DoctorDashboard = () => {
                 <h4 onClick={() => setShowAllergyModal(true)}>Allergies</h4>
                 <Plus className="add-icon" onClick={(() => setShowAddAllergyModal(!showAddAllergyModal))}/>
               </div>
-              {searchResult.allergies.map((allergy, index) => (
+              {allergies.map((allergy, index) => (
                 <p key={index} className="allergy-item">
-                  {allergy}
+                  {allergy.allergyName}
                 </p>
               ))}
             </div>
@@ -438,11 +441,11 @@ const DoctorDashboard = () => {
                 <Plus className="add-icon" onClick={() => setShowAddConditionModal(true)}/>
 
               </div>
-              {searchResult.conditions.map((cond, index) => (
+              {conditions.map((cond, index) => (
                 <p key={index} className="condition-item">
-                  <strong>{cond.name}</strong>
+                  <strong>{cond.conditionName}</strong>
                   <br />
-                  Diagnosed: {cond.date}
+                  Diagnosed: {cond.createdAt}
                   <br />
                   Status: {cond.status}
                 </p>
@@ -454,7 +457,7 @@ const DoctorDashboard = () => {
                 <h4 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h4>
                 <Plus className="add-icon"  onClick={() => setShowAddConditionModal(true)} />
               </div>
-              {searchResult.prescriptions.map((pres, index) => (
+              {latestPrescriptions.map((pres, index) => (
                 <p key={index} className="prescription-item">
                   <strong>{pres.medication}</strong>
                   <br />
@@ -472,13 +475,11 @@ const DoctorDashboard = () => {
               <h4 onClick={() => setShowInsuranceModal(true)}>Insurance Information</h4>
             </div>
               <p className="insurance-info">
-                <strong>{searchResult.insurance.provider}</strong>
+                Policy Number: {latestInsurance?.policyNumber}
                 <br />
-                Policy Number: {searchResult.insurance.policyNumber}
+                Expiry Date: {latestInsurance?.expireDate}
                 <br />
-                Expiry Date: {searchResult.insurance.expiryDate}
-                <br />
-                Coverage: {searchResult.insurance.coverage}
+                Coverage: {latestInsurance?.coverage}
               </p>
             </div>
 
@@ -487,13 +488,13 @@ const DoctorDashboard = () => {
                 <h4 onClick={() => setShowSurgeryModal(true)}>Surgical History</h4>
                 <Plus className="add-icon" onClick={() => setShowAddSurgeryModal(true)}/>
               </div>
-              {searchResult.surgeries.map((surgery, index) => (
+              {surgeries.map((surgery, index) => (
                 <p key={index} className="surgery-item">
-                  <strong>{surgery.name}</strong>
+                  <strong>{surgery.surgeryName}</strong>
                   <br />
-                  Date: {surgery.date}
+                  Date: {surgery.surgeryDate}
                   <br />
-                  Hospital: {surgery.hospital}
+                  Hospital: {surgery.surgeryHospital}
                 </p>
               ))}
             </div>

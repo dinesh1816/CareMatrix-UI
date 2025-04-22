@@ -160,7 +160,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => 
             {isEditing ? (
               <input
                 type="text"
-                name="address"
+                name="street"
                 value={formData.street}
                 onChange={handleChange}
                 className="profile-input"
