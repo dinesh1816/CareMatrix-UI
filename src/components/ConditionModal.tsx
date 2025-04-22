@@ -25,7 +25,7 @@ const ConditionModal: React.FC<ConditionModalProps> = ({ userId, onClose }) => {
   const fetchConditions = async (page: number, size: number) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const response = await fetch(`${baseURL}/patient/${userId}/conditions?page=${page}&size=${size}`, {
+      const response = await fetch(`${baseURL}/patients/${userId}/conditions?page=${page-1}&size=${size}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

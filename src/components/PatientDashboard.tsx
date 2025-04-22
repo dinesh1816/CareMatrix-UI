@@ -113,7 +113,9 @@ const PatientDashboard = () => {
   const fetchPatientProfile = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patients/${patientId}`, {
+      const url = `${baseURL}/patients/${patientId}`;
+      console.log("patientId", patientId, " localstorage id", localStorage.getItem("userId"));
+      const res = await fetch(url, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

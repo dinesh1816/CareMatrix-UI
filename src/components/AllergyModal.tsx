@@ -24,7 +24,7 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ userId, onClose }) => {
   const fetchAllergies = async (page: number, size: number) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const response = await fetch(`${baseURL}/patient/${userId}/allergies?page=${page}&size=${size}`, {
+      const response = await fetch(`${baseURL}/patients/${userId}/allergies?page=${page-1}&size=${size}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -71,7 +71,6 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ userId, onClose }) => {
           <thead>
             <tr>
               <th>Allergy Name</th>
-              <th>Severity</th>
             </tr>
           </thead>
           <tbody>
@@ -79,7 +78,6 @@ const AllergyModal: React.FC<AllergyModalProps> = ({ userId, onClose }) => {
               allergies.map((item, index) => (
                 <tr key={index}>
                   <td>{item.allergyName}</td>
-                  <td>{item.severity}</td>
                 </tr>
               ))
             ) : (

@@ -27,7 +27,7 @@ const InsuranceModal: React.FC<InsuranceModalProps> = ({ userId, onClose }) => {
     try {
       const token = localStorage.getItem("jwtToken");
 
-      const response = await fetch(`${baseURL}/patient/${userId}/insurance?page=${page}&size=${size}`, {
+      const response = await fetch(`${baseURL}/patients/${userId}/insurance?page=${page-1}&size=${size}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

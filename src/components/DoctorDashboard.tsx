@@ -185,6 +185,7 @@ const DoctorDashboard = () => {
       setLatestPrescriptions(data.currentPrescriptions.slice(0,3));
       setSurgeries(data.surgeries.slice(0,3));
       setLatestInsurance(data.insuranceInformations?.[0] || null); // If array
+      
       setGotSearchData(true);
       console.log("patient data", patientName, allergies);
     } catch (error) {
@@ -455,7 +456,7 @@ const DoctorDashboard = () => {
             <div className="card">
               <div className="card-header">
                 <h4 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h4>
-                <Plus className="add-icon"  onClick={() => setShowAddConditionModal(true)} />
+                <Plus className="add-icon"  onClick={() => setShowAddPrescriptionModal(true)} />
               </div>
               {latestPrescriptions.map((pres, index) => (
                 <p key={index} className="prescription-item">
