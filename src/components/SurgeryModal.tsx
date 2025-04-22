@@ -5,7 +5,7 @@ import "./MedicalInfoModal.css";
 type Surgery = {
   surgeryName: string;
   surgeryDate: string;
-  surgeryHospital: string;
+  hospital: string;
 };
 
 interface SurgeryModalProps {
@@ -81,7 +81,7 @@ const SurgeryModal: React.FC<SurgeryModalProps> = ({ userId, onClose }) => {
                 <tr key={index}>
                   <td>{s.surgeryName}</td>
                   <td>{new Date(s.surgeryDate).toLocaleDateString()}</td>
-                  <td>{s.surgeryHospital}</td>
+                  <td>{s.hospital}</td>
                 </tr>
               ))
             ) : (

@@ -36,7 +36,7 @@ const InsuranceModal: React.FC<InsuranceModalProps> = ({ userId, onClose }) => {
       if (!response.ok) throw new Error("Failed to fetch insurances");
 
       const data = await response.json();
-      setInsurances(data.content || []); // adjust if your backend sends a different structure
+      setInsurances(data || []); // adjust if your backend sends a different structure
       setTotalPages(data.totalPages || 1);
       setTotalRecords(data.totalElements || 0);
       console.log("insurances are", insurances);
@@ -73,7 +73,6 @@ const InsuranceModal: React.FC<InsuranceModalProps> = ({ userId, onClose }) => {
         <table className="modal-table">
           <thead>
             <tr>
-              <th>Provider</th>
               <th>Policy Number</th>
               <th>Expiry Date</th>
               <th>Coverage</th>
@@ -83,7 +82,6 @@ const InsuranceModal: React.FC<InsuranceModalProps> = ({ userId, onClose }) => {
             {insurances.length > 0 ? (
               insurances.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.providerName}</td>
                   <td>{item.policyNumber}</td>
                   <td>{new Date(item.expireDate).toLocaleDateString()}</td>
                   <td>{item.coverage}</td>
