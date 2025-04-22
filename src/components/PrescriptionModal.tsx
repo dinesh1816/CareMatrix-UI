@@ -27,7 +27,7 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({ userId, onClose }
   const fetchPrescriptions = async (page: number, size: number) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/prescriptions/${userId}?page=${page}&size=${size}`, {
+      const res = await fetch(`${baseURL}/patient/${userId}/prescriptions?page=${page}&size=${size}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

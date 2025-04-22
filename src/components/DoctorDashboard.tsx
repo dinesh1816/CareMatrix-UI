@@ -188,6 +188,26 @@ const DoctorDashboard = () => {
       console.error("Error fetching patient data:", error);
     }
   };
+
+  const fetchDoctorAppointments = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/appointments/doctor/${localStorage.getItem("userId")}/latest-upcoming`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch appointments");
+
+      const data = await res.json();
+      setUpcomingAppointments(data.upcomingAppointments || []);
+      setPastAppointments(data.pastAppointments || []);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    }
+  };
   
 
   const handleAddAllergy = async (allergy: { allergyName: string; severity: string; notes?: string }) => {
@@ -263,7 +283,7 @@ const DoctorDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/surgeries/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/surgeries`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -291,7 +311,7 @@ const DoctorDashboard = () => {
   const fetchDoctorDetails = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patients/${doctorId}`, {
+      const res = await fetch(`${baseURL}/doctors/${doctorId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -322,8 +342,13 @@ const DoctorDashboard = () => {
     }
   }
 
-  useEffect(() => {
+  const fetchDoctorDashboard = () => {
+    fetchDoctorAppointments();
     fetchDoctorDetails();
+  }
+
+  useEffect(() => {
+    fetchDoctorDashboard();
   }, []);
 
   return (

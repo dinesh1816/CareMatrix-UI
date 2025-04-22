@@ -133,7 +133,7 @@ const PatientDashboard = () => {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patient/appointments/${patientId}`, {
+      const res = await fetch(`${baseURL}/appointments/patient/${patientId}/latest-upcoming`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -263,7 +263,7 @@ const PatientDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patient/insurance/${patientId}`, {
+      const res = await fetch(`${baseURL}/patient/${patientId}/insurance`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

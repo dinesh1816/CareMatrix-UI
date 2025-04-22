@@ -34,14 +34,14 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
         let res;
 
         if (doctorId != null) {
-          res = await fetch(`${baseURL}/appointments/doctor/${doctorId}`, {
+          res = await fetch(`${baseURL}/appointments/doctor/${doctorId}/paginated`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
         } else if (patientId != null) {
-          res = await fetch(`${baseURL}/appointments/patientId/${patientId}`, {
+          res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
