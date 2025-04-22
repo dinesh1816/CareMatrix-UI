@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 
 type Appointment = {
   id: number;
-  appointmentDate: string;
+  date: string;
   reason: string;
   status: string;
   doctorName: string;
@@ -84,9 +84,9 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           <thead>
             <tr>
               <th>Date</th>
-              <th>Reason</th>
-              <th>Status</th>
-              <th>{(localStorage.getItem("role") === "patient") ? "Doctor" : "Patient"}</th>
+              {/* <th>Reason</th>
+              <th>Status</th> */}
+              {/* <th>{(localStorage.getItem("role") === "patient") ? "Doctor" : "Patient"}</th> */}
               <th>Meeting Link</th>
             </tr>
           </thead>
@@ -94,11 +94,11 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
             {appointments.length > 0 ? (
               appointments.map((a, i) => (
                 <tr key={i}>
-                  <td>{new Date(a.appointmentDate).toLocaleDateString()}</td>
-                  <td>{a.reason}</td>
-                  <td>{a.status}</td>
+                  <td>{new Date(a.date).toLocaleDateString()}</td>
+                  {/* <td>{a.reason}</td> */}
+                  {/* <td>{a.status}</td>
                   <td>{a.patientName}</td>
-                  <td>{localStorage.getItem("role") === "patient" ? a.doctorName : a.patientName}</td>
+                  <td>{localStorage.getItem("role") === "patient" ? a.doctorName : a.patientName}</td> */}
                   <td>{a.meetingLink}</td>
                 </tr>
               ))
