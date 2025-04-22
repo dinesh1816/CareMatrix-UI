@@ -8,7 +8,8 @@ type Appointment = {
   reason: string;
   status: string;
   doctorName: string;
-  patientName: string;
+  patientName: string | null;
+  meetingLink: string | null;
 };
 
 interface AppointmentsModalProps {
@@ -79,8 +80,8 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
               <th>Date</th>
               <th>Reason</th>
               <th>Status</th>
-              <th>Doctor</th>
-              <th>Patient</th>
+              <th>{(localStorage.getItem("role") === "patient") ? "doctor" : "patient"}</th>
+              <th>Meeting Link</th>
             </tr>
           </thead>
           <tbody>
@@ -90,13 +91,14 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
                   <td>{new Date(a.appointmentDate).toLocaleDateString()}</td>
                   <td>{a.reason}</td>
                   <td>{a.status}</td>
-                  <td>{a.doctorName}</td>
                   <td>{a.patientName}</td>
+                  <td>{localStorage.getItem("role") === "patient" ? a.doctorName : a.patientName}</td>
+                  <td>{a.meetingLink}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center">No appointments found.</td>
+                <td colSpan={6} className="text-center">No appointments found.</td>
               </tr>
             )}
           </tbody>

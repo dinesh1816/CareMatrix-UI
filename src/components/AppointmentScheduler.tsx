@@ -70,19 +70,19 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({ onClose }) 
     try {
       if (userRole === "doctor") {
         res = await fetch(`${baseURL}/appointments?doctorId=${localStorage.getItem("userId")}&paitentId=${selectedPatientId}`, {
-          method: "GET",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
+          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "In-person" })
         });
       } else if (userRole === "patient") {
         res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}$doctorId=${selectedDoctorId}`, {
-          method: "GET",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
+          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "In-person" })
         });
       } else {
         throw new Error("Either doctorId or patientId must be provided.");

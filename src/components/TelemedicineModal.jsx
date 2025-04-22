@@ -79,7 +79,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
     try {
       if (role === "doctor") {
         res = await fetch(`${baseURL}/appointments?doctorId=${localStorage.getItem("userId")}&paitentId=${selectedPatientId}`, {
-          method: "GET",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -87,7 +87,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
         });
       } else if (role === "patient") {
         res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}$doctorId=${selectedDoctorId}`, {
-          method: "GET",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
