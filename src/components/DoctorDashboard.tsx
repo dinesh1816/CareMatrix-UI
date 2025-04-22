@@ -22,11 +22,11 @@ const baseURL = process.env.REACT_APP_API_BASE_URL;
 const doctorId = localStorage.getItem("userId");
 
 type Appointment = {
-  id: number;
-  appointmentDate: string;
+  date: string;
+  time: string;
   reason: string;
-  status: string;
-  doctorName: string;
+  type: string;
+  link: string;
 };
 
 type Allergy = {
@@ -254,7 +254,7 @@ const DoctorDashboard = () => {
   };
 
   const handleAddPrescription = async (prescription: {
-    medication: string;
+    medicationName: string;
     dosage: string;
     frequency: string;
     prescribedDate: string;

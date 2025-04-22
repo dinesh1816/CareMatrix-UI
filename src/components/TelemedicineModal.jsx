@@ -72,35 +72,44 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
   }, [role]);
 
   const handleStart = async () => {
-    const who = role === 'patient' ? `Doctor ID: ${selectedDoctorId}` : `Patient ID: ${selectedPatientId}`;
-    alert(`Consultation scheduled with ${who} on ${selectedDate} at ${selectedTime} for: ${reason}`);
     const token = localStorage.getItem("jwtToken");
-    let res;
+    const userId = localStorage.getItem("userId");
+    const normalizedRole = role?.toLowerCase();
+  
+    const query =
+      normalizedRole === "doctor"
+        ? `doctorId=${userId}&patientId=${selectedPatientId}`
+        : `patientId=${userId}&doctorId=${selectedDoctorId}`;
+  
     try {
-      if (role === "doctor") {
-        res = await fetch(`${baseURL}/appointments?doctorId=${localStorage.getItem("userId")}&paitentId=${selectedPatientId}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
-        });
-      } else if (role === "patient") {
-        res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}&doctorId=${selectedDoctorId}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "Telemedicine" })
-        });
+      const res = await fetch(`${baseURL}/appointments?${query}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          date: selectedDate,
+          time: selectedTime,
+          reason: reason,
+          type: "Telemedicine"
+        })
+      });
+  
+      if (res.ok) {
+        alert("Telemedicine appointment scheduled successfully!");
+        onClose();
       } else {
-        throw new Error("Either doctorId or patientId must be provided.");
+        const errorText = await res.text();
+        console.error("Failed to schedule:", res.status, errorText);
+        alert("Failed to schedule appointment: " + errorText);
       }
     } catch (err) {
-      console.error("Error scheuling appointment:", err);
+      console.error("Network or server error:", err);
+      alert("An unexpected error occurred. Please try again.");
     }
-
   };
+  
 
   return (
     <div className="modal-overlay">

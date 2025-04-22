@@ -55,40 +55,41 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({ onClose }) 
 
   const handleSchedule = async () => {
     const token = localStorage.getItem("jwtToken");
-
-    const payload = {
-      date: selectedDate,
-      time: selectedTime,
-      reason,
-      doctorId: userRole === "patient" ? selectedDoctorId : localStorage.getItem("userId"),
-      patientId: userRole === "doctor" ? selectedPatientId : localStorage.getItem("userId"),
-    };
-
-    const who = userRole === 'patient' ? `Doctor ID: ${selectedDoctorId}` : `Patient ID: ${selectedPatientId}`;
-    alert(`Consultation scheduled with ${who} on ${selectedDate} at ${selectedTime} for: ${reason}`);
-    let res;
+    const userId = localStorage.getItem("userId");
+    const role = localStorage.getItem("role");
+    const normalizedRole = role?.toLowerCase();
+  
+    const query =
+      normalizedRole === "doctor"
+        ? `doctorId=${userId}&patientId=${selectedPatientId}`
+        : `patientId=${userId}&doctorId=${selectedDoctorId}`;
+  
     try {
-      if (userRole === "doctor") {
-        res = await fetch(`${baseURL}/appointments?doctorId=${localStorage.getItem("userId")}&paitentId=${selectedPatientId}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "In-person" })
-        });
-      } else if (userRole === "patient") {
-        res = await fetch(`${baseURL}/appointments?patientId=${localStorage.getItem("userId")}$doctorId=${selectedDoctorId}`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ date: selectedDate, time: selectedTime, reason: reason, type: "In-person" })
-        });
+      const res = await fetch(`${baseURL}/appointments?${query}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          date: selectedDate,
+          time: selectedTime,
+          reason: reason,
+          type: "In-person"
+        })
+      });
+  
+      if (res.ok) {
+        alert("Telemedicine appointment scheduled successfully!");
+        onClose();
       } else {
-        throw new Error("Either doctorId or patientId must be provided.");
+        const errorText = await res.text();
+        console.error("Failed to schedule:", res.status, errorText);
+        alert("Failed to schedule appointment: " + errorText);
       }
     } catch (err) {
-      console.error("Error scheuling appointment:", err);
+      console.error("Network or server error:", err);
+      alert("An unexpected error occurred. Please try again.");
     }
   };
 

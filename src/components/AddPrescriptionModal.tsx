@@ -4,7 +4,7 @@ import "./AddConditionModal.css"; // Reuse the same styling
 interface AddPrescriptionModalProps {
   onClose: () => void;
   onAdd: (prescription: {
-    medication: string;
+    medicationName: string;
     dosage: string;
     frequency: string;
     instructions: string;
@@ -23,7 +23,7 @@ const AddPrescriptionModal: React.FC<AddPrescriptionModalProps> = ({ onClose, on
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAdd({ medication, dosage, frequency, instructions, prescribedDate, notes });
+    onAdd({ medicationName: medication, dosage, frequency, instructions, prescribedDate, notes });
     onClose();
   };
 

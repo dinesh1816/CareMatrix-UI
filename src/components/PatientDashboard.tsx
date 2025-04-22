@@ -19,11 +19,11 @@ const patientId = localStorage.getItem("userId");
 console.log("patient id is", patientId, "localstorageid is", localStorage.getItem("userId"));
 
 type Appointment = {
-  id: number;
-  appointmentDate: string;
+  date: string;
+  time: string;
   reason: string;
-  status: string;
-  doctorName: string;
+  type: string;
+  link: string;
 };
 
 type Allergy = {
@@ -135,7 +135,7 @@ const PatientDashboard = () => {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/appointments/patients/${patientId}/latest-upcoming`, {
+      const res = await fetch(`${baseURL}/appointments/patient/${patientId}/latest-upcoming`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -145,8 +145,8 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch appointments");
 
       const data = await res.json();
-      setUpcomingAppointments(data.upcomingAppointments || []);
-      setPastAppointments(data.pastAppointments || []);
+      setUpcomingAppointments(data.upcoming || []);
+      setPastAppointments(data.latest || []);
     } catch (err) {
       console.error("Error fetching appointments:", err);
     }

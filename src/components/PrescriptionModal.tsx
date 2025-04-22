@@ -3,10 +3,9 @@ import { X } from "lucide-react";
 import "./MedicalInfoModal.css";
 
 type Prescription = {
-  medication: string;
+  medicationName: string;
   dosage: string;
   frequency: string;
-  instructions: string;
   prescribedDate: string;
 };
 
@@ -75,7 +74,6 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({ userId, onClose }
               <th>Medication</th>
               <th>Dosage</th>
               <th>Frequency</th>
-              <th>Instructions</th>
               <th>Prescribed Date</th>
             </tr>
           </thead>
@@ -83,10 +81,9 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({ userId, onClose }
             {prescriptions.length > 0 ? (
               prescriptions.map((p, i) => (
                 <tr key={i}>
-                  <td>{p.medication}</td>
+                  <td>{p.medicationName}</td>
                   <td>{p.dosage}</td>
                   <td>{p.frequency}</td>
-                  <td>{p.instructions}</td>
                   <td>{new Date(p.prescribedDate).toLocaleDateString()}</td>
                 </tr>
               ))

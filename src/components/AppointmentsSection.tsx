@@ -3,11 +3,11 @@ import "./AppointmentsSection.css";
 import { Calendar, Clock } from "lucide-react";
 
 type Appointment = {
-  id: number;
-  appointmentDate: string;
+  date: string;
+  time: string;
   reason: string;
-  status: string; // "Telemedicine" | "In-person"
-  doctorName: string;
+  type: string;
+  link: string;
 };
 
 type Props = {
@@ -26,15 +26,15 @@ const AppointmentsSection: React.FC<Props> = ({
         <h2 className="section-title">Upcoming Appointments</h2>
         {upcomingAppointments.length ? (
           upcomingAppointments.map((a) => (
-            <div key={a.id} className="appointment-card">
-              <p className="patient-name">{a.doctorName}</p>
+            <div key={a.reason} className="appointment-card">
+              <p className="patient-name">{a.time}</p>
               <p>
                 <Calendar className="icon" size={16} />
-                {new Date(a.appointmentDate).toLocaleDateString()}
+                {new Date(a.date).toLocaleDateString()}
               </p>
               <p>
                 <Clock className="icon" size={16} />
-                {new Date(a.appointmentDate).toLocaleTimeString([], {
+                {new Date(a.date).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
@@ -42,12 +42,12 @@ const AppointmentsSection: React.FC<Props> = ({
               <p>{a.reason}</p>
               <span
                 className={`badge ${
-                  a.status.toLowerCase() === "telemedicine"
+                  a.type.toLowerCase() === "telemedicine"
                     ? "telemedicine"
                     : "in-person"
                 }`}
               >
-                {a.status}
+                {a.reason}
               </span>
             </div>
           ))
@@ -61,15 +61,15 @@ const AppointmentsSection: React.FC<Props> = ({
         <h2 className="section-title">Past Appointments</h2>
         {pastAppointments.length ? (
           pastAppointments.map((a) => (
-            <div key={a.id} className="appointment-card">
-              <p className="patient-name">{a.doctorName}</p>
+            <div key={a.reason} className="appointment-card">
+              <p className="patient-name">{a.time}</p>
               <p>
                 <Calendar className="icon" size={16} />
-                {new Date(a.appointmentDate).toLocaleDateString()}
+                {new Date(a.date).toLocaleDateString()}
               </p>
               <p>
                 <Clock className="icon" size={16} />
-                {new Date(a.appointmentDate).toLocaleTimeString([], {
+                {new Date(a.date).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
@@ -77,12 +77,12 @@ const AppointmentsSection: React.FC<Props> = ({
               <p>{a.reason}</p>
               <span
                 className={`badge ${
-                  a.status.toLowerCase() === "telemedicine"
+                  a.type.toLowerCase() === "telemedicine"
                     ? "telemedicine"
                     : "in-person"
                 }`}
               >
-                {a.status}
+                {a.reason}
               </span>
             </div>
           ))

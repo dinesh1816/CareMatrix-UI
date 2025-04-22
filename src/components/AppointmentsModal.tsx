@@ -41,7 +41,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
             },
           });
         } else if (patientId != null) {
-          res = await fetch(`${baseURL}/appointments/patients/${patientId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
+          res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
