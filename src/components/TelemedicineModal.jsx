@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Video } from "lucide-react";
 import './TelemedicineModal.css';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
@@ -75,6 +76,9 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
     const token = localStorage.getItem("jwtToken");
     const userId = localStorage.getItem("userId");
     const normalizedRole = role?.toLowerCase();
+    console.log("the selected date is", selectedDate);
+    const [year, month, day] = selectedDate.split("-");
+    const formattedDate = `${month}-${day}-${year}`;
   
     const query =
       normalizedRole === "doctor"
@@ -82,14 +86,14 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
         : `patientId=${userId}&doctorId=${selectedDoctorId}`;
   
     try {
-      const res = await fetch(`${baseURL}/appointments?${query}`, {
+      const res = await fetch(`${baseURL}/appointments/create?${query}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          date: selectedDate,
+          date: formattedDate,
           time: selectedTime,
           reason: reason,
           type: "Telemedicine"
@@ -116,7 +120,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
       <div className="telemedicine-modal">
         <div className="modal-header">
           <div className="modal-title">
-            <span className="icon">📹</span>
+            <Video />
             <h2>Telemedicine Consultation</h2>
           </div>
           <button className="close-btn" onClick={onClose}>×</button>

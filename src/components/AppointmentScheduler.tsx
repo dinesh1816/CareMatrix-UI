@@ -1,5 +1,6 @@
 // AppointmentScheduler.tsx
 import React, { useEffect, useState } from 'react';
+import { Calendar } from "lucide-react";
 import './AppointmentScheduler.css';
 
 interface AppointmentSchedulerProps {
@@ -98,7 +99,7 @@ const AppointmentScheduler: React.FC<AppointmentSchedulerProps> = ({ onClose }) 
       <div className="telemedicine-modal">
         <div className="modal-header">
           <div className="modal-title">
-            <span className="icon">📅</span>
+            <Calendar />
             <h2>Schedule Appointment</h2>
           </div>
           <button className="close-btn" onClick={onClose}>×</button>

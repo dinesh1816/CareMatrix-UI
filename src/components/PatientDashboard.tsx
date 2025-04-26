@@ -278,6 +278,7 @@ const PatientDashboard = () => {
   
       const newInsurance = await res.json();
       setAddInsurance((prev) => [...prev, newInsurance]);
+      fetchPatientInsurance();
     } catch (err) {
       console.error("Error adding allergy:", err);
     }
