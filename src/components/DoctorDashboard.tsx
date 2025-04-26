@@ -213,6 +213,77 @@ const DoctorDashboard = () => {
     }
   };
   
+  const fetchAllergies = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await fetch(`${baseURL}/patients/${patientId}/allergies?page=0&size=3`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch allergies");
+
+      const data = await response.json();
+      setAllergies(data.content);
+    } catch (err) {
+      console.error("Error fetching allergies:", err);
+    }
+  };
+
+  const fetchConditions = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const response = await fetch(`${baseURL}/patients/${patientId}/conditions?page=0&size=1`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch conditions");
+
+      const data = await response.json();
+      setConditions(data.content);
+    } catch (err) {
+      console.error("Error fetching conditions:", err);
+    }
+  };
+
+  const fetchPrescriptions = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/patients/${patientId}/prescriptions?page=0&size=3`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch prescriptions");
+
+      const data = await res.json();
+      setLatestPrescriptions(data.content);        // Adjust if backend uses different structure
+    } catch (err) {
+      console.error("Error fetching prescriptions:", err);
+    }
+  };
+
+  const fetchSurgeries = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/patients/${patientId}/surgeries?page=0&size=3`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch surgeries");
+
+      const data = await res.json();
+      setSurgeries(data.content);         // adjust if backend returns different structure
+    } catch (err) {
+      console.error("Error fetching surgeries:", err);
+    }
+  };
 
   const handleAddAllergy = async (allergy: { allergyName: string; notes?: string }) => {
     try {
@@ -228,6 +299,9 @@ const DoctorDashboard = () => {
       });
   
       if (!res.ok) throw new Error("Failed to add allergy");
+      else if(res.ok) {
+        fetchAllergies();
+      }
   
     } catch (err) {
       console.error("Error adding allergy:", err);
@@ -248,6 +322,9 @@ const DoctorDashboard = () => {
       });
   
       if (!res.ok) throw new Error("Failed to add allergy");
+      else if(res.ok){
+        fetchConditions();
+      }
     } catch (err) {
       console.error("Error adding allergy:", err);
     }
@@ -273,6 +350,9 @@ const DoctorDashboard = () => {
       });
   
       if (!res.ok) throw new Error("Failed to add prescription");
+      else if(res.ok) {
+        fetchPrescriptions();
+      }
     } catch (err) {
       console.error("Error adding prescription:", err);
     }
@@ -297,6 +377,9 @@ const DoctorDashboard = () => {
       });
   
       if (!res.ok) throw new Error("Failed to add prescription");
+      else if(res.ok) {
+        fetchSurgeries();
+      }
     } catch (err) {
       console.error("Error adding prescription:", err);
     }
