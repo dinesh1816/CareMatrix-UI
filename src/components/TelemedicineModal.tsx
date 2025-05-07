@@ -23,6 +23,7 @@ interface TelemedicineModalProps {
 }
 
 const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) => {
+  const [appointmentType, setAppointmentType] = useState("");
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [reason, setReason] = useState('');
@@ -169,6 +170,11 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
               </select>
             </div>
 
+            <label>Select Appointment type</label>
+            <select value={appointmentType} onChange={(e) => setAppointmentType(e.target.value)}>
+              <option value="Telemedicine">Telemedicine</option>
+              <option value="In-person">In-person</option>
+            </select>
             <div className="right-section">
               <label>Select Date</label>
               <input

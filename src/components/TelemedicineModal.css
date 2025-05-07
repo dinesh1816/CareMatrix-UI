@@ -113,6 +113,12 @@
     border-radius: 6px;
     cursor: pointer;
   }
+
+  .time-btn.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }  
   
   .time-btn.selected {
     background-color: #2563eb;

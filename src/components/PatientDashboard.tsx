@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./PatientDashboard.css";
-import AppointmentScheduler from "./AppointmentScheduler";
 import AppointmentsSection from "./AppointmentsSection";
-import TelemedicineModal from "./TelemedicineModal";
 import { ProfileModal } from "./ProfileModal";
 import AllergyModal from "./AllergyModal";
 import ConditionModal from "./ConditionModal";
@@ -288,14 +286,6 @@ const PatientDashboard = () => {
     <div className="dashboard-container">
       <div className="top-bar">
         <h1>Welcome, {patientProfile?.name || "Patient"}</h1>
-        <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
-          <Video />Telemedicine Consultation
-        </button>
-        {showTelemedicineModal && <TelemedicineModal onClose={() => setShowTelemedicineModal(false)} role={localStorage.getItem("role")} />}
-        <button onClick={() => setShowAppointmentScheduler(true)} className="appointment-btn">
-          <Calendar />Schedule Appointment
-        </button>
-        {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)}/>}
         <div className="icons">
           <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
           {showProfile && patientProfile && <ProfileModal user={patientProfile} onClose={() => setShowProfile(false)} />}

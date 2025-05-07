@@ -6,7 +6,6 @@ import AddConditionModal from "./AddConditionModal";
 import AddPrescriptionModal from "./AddPrescriptionModal";
 import AddSurgeryModal from "./AddSurgeryModal";
 // import { users } from "../data/user";
-import AppointmentScheduler from "./AppointmentScheduler";
 import AppointmentsSection from "./AppointmentsSection";
 import TelemedicineModal from "./TelemedicineModal";
 import { ProfileModal } from "./ProfileModal";
@@ -443,13 +442,9 @@ const DoctorDashboard = () => {
       <div className="doctor-top-bar">
         <h2>Welcome Dr. {doctorName}</h2>
         <button onClick={() => setShowTelemedicineModal(true)} className="telemedicine-btn">
-          <Video />Telemedicine Consultation
+          <Video />Schedule Appointment
         </button>
         {showTelemedicineModal && <TelemedicineModal onClose={() => setShowTelemedicineModal(false)} role={localStorage.getItem("role")}/>}
-        <button onClick={() => setShowAppointmentScheduler(true)} className="appointment-btn">
-          <Calendar />Schedule Appointment
-        </button>
-        {showAppointmentScheduler && <AppointmentScheduler onClose={() => setShowAppointmentScheduler(false)}/>}
         <div className="icons">
           <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
           {showProfile && (
