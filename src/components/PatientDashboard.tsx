@@ -10,7 +10,7 @@ import PrescriptionModal from "./PrescriptionModal";
 import SurgeryModal from "./SurgeryModal";
 import AppointmentsModal from "./AppointmentsModal";
 import AddInsuranceModal from "./AddInsuranceModal";
-import { UserCircle2, LogOut, Calendar, Video, Plus } from "lucide-react";
+import { UserCircle2, LogOut, Plus } from "lucide-react";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const patientId = localStorage.getItem("userId");
@@ -84,8 +84,6 @@ const PatientDashboard = () => {
   const [latestPrescriptions, setLatestPrescriptions] = useState<Prescription[]>([]);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [showAppointmentScheduler, setShowAppointmentScheduler] = useState(false);
-  const [showTelemedicineModal, setShowTelemedicineModal] = useState(false);
 
   const [showAllergyModal, setShowAllergyModal] = useState(false);
   const [showConditionModal, setShowConditionModal] = useState(false);

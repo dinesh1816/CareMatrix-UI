@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./MedicalInfoModal.css";
+import Banner from './Banner';
 import { X } from "lucide-react";
 
 type Appointment = {
@@ -25,43 +26,44 @@ const role = localStorage.getItem("role")
 
 const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, doctorId, patientId }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [banner, setBanner] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Track total pages
 
-  useEffect(() => {
-    const fetchAppointmentData = async () => {
-      try {
-        const token = localStorage.getItem("jwtToken");
-        let res;
+  const fetchAppointmentData = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      let res;
 
-        if (doctorId != null) {
-          res = await fetch(`${baseURL}/appointments/doctor/${doctorId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-        } else if (patientId != null) {
-          res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-        } else {
-          throw new Error("Either doctorId or patientId must be provided.");
-        }
-
-        if (!res.ok) throw new Error("Failed to fetch appointments");
-
-        const appointmentsList = await res.json();
-        setAppointments(appointmentsList.content); // Set appointment data
-        setTotalPages(appointmentsList.totalPages); // Set total pages
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
+      if (doctorId != null) {
+        res = await fetch(`${baseURL}/appointments/doctor/${doctorId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else if (patientId != null) {
+        res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        throw new Error("Either doctorId or patientId must be provided.");
       }
-    };
 
+      if (!res.ok) throw new Error("Failed to fetch appointments");
+
+      const appointmentsList = await res.json();
+      setAppointments(appointmentsList.content); // Set appointment data
+      setTotalPages(appointmentsList.totalPages); // Set total pages
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    }
+  };
+  
+  useEffect(() => {
     fetchAppointmentData();
   }, [currentPage, doctorId, patientId]); // Fetch data when page changes
 
@@ -84,11 +86,11 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
       });
   
       if (res.ok) {
-        setAppointments(prev => prev.filter(app => app.id !== appointmentId));
-        // Optionally: show a success banner here
+        fetchAppointmentData();
+        setBanner({ message: 'Appointment Cancelled successfully', type: 'success' });
       } else {
         console.error("Failed to cancel appointment.");
-        // Optionally: show error banner here
+        setBanner({ message: 'Failed to cancel appointment', type: 'error' });
       }
     } catch (err) {
       console.error("Error cancelling appointment:", err);
@@ -156,6 +158,15 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           </button>
         </div>
       </div>
+      <>
+      {banner && (
+        <Banner
+          message={banner.message}
+          type={banner.type}
+          onClose={() => setBanner(null)}
+        />
+      )}
+    </>
     </div>
   );
 };

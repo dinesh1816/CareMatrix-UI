@@ -16,7 +16,7 @@ import InsuranceModal from "./InsuranceModal";
 import PrescriptionModal from "./PrescriptionModal";
 import SurgeryModal from "./SurgeryModal";
 import AppointmentsModal from "./AppointmentsModal";
-import { Search, UserCircle2, LogOut, Plus, Video, Calendar } from "lucide-react";
+import { Search, UserCircle2, LogOut, Plus, Video } from "lucide-react";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const doctorId = localStorage.getItem("userId");
@@ -64,7 +64,6 @@ type Surgery = {
 
 const DoctorDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
-  const [showAppointmentScheduler, setShowAppointmentScheduler] = useState(false);
   const [showTelemedicineModal, setShowTelemedicineModal] = useState(false);
   const [banner, setBanner] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [allergies, setAllergies] = useState<Allergy[]>([]);
