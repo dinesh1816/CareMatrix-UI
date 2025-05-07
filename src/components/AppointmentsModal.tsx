@@ -21,6 +21,7 @@ interface AppointmentsModalProps {
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const ITEMS_PER_PAGE = 5;
+const role = localStorage.getItem("role")
 
 const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, doctorId, patientId }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -72,6 +73,29 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
 
+  const handleCancelAppointment = async (appointmentId: number) => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/appointments/${appointmentId}/cancel`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (res.ok) {
+        setAppointments(prev => prev.filter(app => app.id !== appointmentId));
+        // Optionally: show a success banner here
+      } else {
+        console.error("Failed to cancel appointment.");
+        // Optionally: show error banner here
+      }
+    } catch (err) {
+      console.error("Error cancelling appointment:", err);
+    }
+  };
+  
+
   return (
     <div className="modal-overlay">
       <div className="modal-container">
@@ -84,10 +108,8 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           <thead>
             <tr>
               <th>Date</th>
-              {/* <th>Reason</th>
-              <th>Status</th> */}
-              {/* <th>{(localStorage.getItem("role") === "patient") ? "Doctor" : "Patient"}</th> */}
               <th>Meeting Link</th>
+              {role==="doctor" && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -95,10 +117,6 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
               appointments.map((a, i) => (
                 <tr key={i}>
                   <td>{new Date(a.date).toLocaleDateString()}</td>
-                  {/* <td>{a.reason}</td> */}
-                  {/* <td>{a.status}</td>
-                  <td>{a.patientName}</td>
-                  <td>{localStorage.getItem("role") === "patient" ? a.doctorName : a.patientName}</td> */}
                   <td>
                   {a.meetingLink ? (
                     <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
@@ -108,6 +126,16 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
                     "No link"
                   )}
                   </td>
+                  {localStorage.getItem("role") === "doctor" && (
+                  <td>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => handleCancelAppointment(a.id)}
+                    >
+                      Cancel Appointment
+                    </button>
+                  </td>
+                )}
                 </tr>
               ))
             ) : (

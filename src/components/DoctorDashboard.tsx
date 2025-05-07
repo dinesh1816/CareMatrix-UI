@@ -305,7 +305,7 @@ const DoctorDashboard = () => {
       }
       else if(res.ok) {
         fetchAllergies();
-        setBanner({ message: 'Data added successfully', type: 'success' });
+        setBanner({ message: 'Allergy added successfully', type: 'success' });
       }
   
     } catch (err) {
@@ -329,6 +329,7 @@ const DoctorDashboard = () => {
       if (!res.ok) throw new Error("Failed to add allergy");
       else if(res.ok){
         fetchConditions();
+        setBanner({ message: 'Condition added successfully', type: 'success' });
       }
     } catch (err) {
       console.error("Error adding allergy:", err);
@@ -357,6 +358,7 @@ const DoctorDashboard = () => {
       if (!res.ok) throw new Error("Failed to add prescription");
       else if(res.ok) {
         fetchPrescriptions();
+        setBanner({ message: 'Prescription added successfully', type: 'success' });
       }
     } catch (err) {
       console.error("Error adding prescription:", err);
@@ -384,6 +386,7 @@ const DoctorDashboard = () => {
       if (!res.ok) throw new Error("Failed to add prescription");
       else if(res.ok) {
         fetchSurgeries();
+        setBanner({ message: 'Surgery information added successfully', type: 'success' });
       }
     } catch (err) {
       console.error("Error adding prescription:", err);
