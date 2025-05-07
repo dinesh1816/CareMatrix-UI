@@ -33,7 +33,7 @@ type Allergy = {
 
 type Condition = {
   conditionName: string;
-  createdAt: string;
+  diagnosedDate: string;
   status: string;
 };
 
@@ -113,7 +113,7 @@ const PatientDashboard = () => {
   const fetchPatientProfile = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const url = `${baseURL}/patients/${patientId}`;
+      const url = `${baseURL}/patients/get/${patientId}`;
       console.log("patientId", patientId, " localstorage id", localStorage.getItem("userId"));
       const res = await fetch(url, {
         method: "GET",
@@ -328,7 +328,7 @@ const PatientDashboard = () => {
           <div className="condition-list">
             {conditions.length ? (
               conditions.map((c, i) => (
-                <p key={i}><strong>{c.conditionName}</strong><br />Diagnosed on: {new Date(c.createdAt).toLocaleDateString()}</p>
+                <p key={i}><strong>{c.conditionName}</strong><br />Diagnosed on: {new Date(c.diagnosedDate).toLocaleDateString()}</p>
               ))
             ) : (
               <p className="text-gray-600">No existing conditions</p>

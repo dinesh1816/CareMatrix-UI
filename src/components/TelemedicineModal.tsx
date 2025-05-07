@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Video } from "lucide-react";
 import './TelemedicineModal.css';
 
-const baseURL = process.env.REACT_APP_API_BASE_URL;
+const baseURL = process.env.REACT_APP_API_BASE_URL || "";
 
 interface Doctor {
   id: number;
@@ -19,17 +19,18 @@ interface Patient {
 
 interface TelemedicineModalProps {
   onClose: () => void;
-  role: string | null; // passed from dashboard
+  role: string | null;
 }
 
 const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [reason, setReason] = useState('');
-  const [doctors, setDoctors] = useState([]);
-  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [patients, setPatients] = useState<Patient[]>([]);  
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [selectedPatientId, setSelectedPatientId] = useState('');
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
 
   const timeSlots = [
     "09:00", "09:30", "10:00",
@@ -64,27 +65,49 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
     }
   };
 
+  const fetchAvailableSlots = async (date: string) => {
+    const formattedDate = new Date(date).toISOString().split("T")[0];
+
+    // Replace with real API when available
+    const mockAvailability: { [key: string]: string[] } = {
+      "2025-05-06": ["09:00", "10:30", "15:00"],
+      "2025-05-07": ["11:00", "14:30", "16:00"],
+    };
+
+    return new Promise<string[]>((resolve) => {
+      setTimeout(() => {
+        resolve(mockAvailability[formattedDate] || []);
+      }, 300);
+    });
+  };
+
+  const handleSlotClick = (slot: string) => {
+    setSelectedTime(slot);
+  };
+
   useEffect(() => {
-    if (localStorage.getItem("role") === 'patient') {
-      fetchDoctors();
-    } else if (localStorage.getItem("role") === 'doctor') {
-      fetchPatients();
-    }
+    if (role === 'patient') fetchDoctors();
+    else if (role === 'doctor') fetchPatients();
   }, [role]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchAvailableSlots(selectedDate).then(setAvailableSlots);
+    }
+  }, [selectedDate]);
 
   const handleStart = async () => {
     const token = localStorage.getItem("jwtToken");
     const userId = localStorage.getItem("userId");
     const normalizedRole = role?.toLowerCase();
-    console.log("the selected date is", selectedDate);
     const [year, month, day] = selectedDate.split("-");
     const formattedDate = `${month}-${day}-${year}`;
-  
+
     const query =
       normalizedRole === "doctor"
         ? `doctorId=${userId}&patientId=${selectedPatientId}`
         : `patientId=${userId}&doctorId=${selectedDoctorId}`;
-  
+
     try {
       const res = await fetch(`${baseURL}/appointments/create?${query}`, {
         method: "POST",
@@ -95,11 +118,11 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
         body: JSON.stringify({
           date: formattedDate,
           time: selectedTime,
-          reason: reason,
+          reason,
           type: "Telemedicine"
         })
       });
-  
+
       if (res.ok) {
         alert("Telemedicine appointment scheduled successfully!");
         onClose();
@@ -113,7 +136,6 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
       alert("An unexpected error occurred. Please try again.");
     }
   };
-  
 
   return (
     <div className="modal-overlay">
@@ -141,7 +163,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
                 <option value="">-- Select --</option>
                 {(role === 'patient' ? doctors : patients).map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.name} {role === 'patient' ? `(${item.specialization})` : ''}
+                    {item.name} {role === 'patient' && 'specialization' in item ? `(${item.specialization})` : ''}
                   </option>
                 ))}
               </select>
@@ -160,8 +182,9 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
                 {timeSlots.map((slot, index) => (
                   <button
                     key={index}
-                    className={`time-btn ${selectedTime === slot ? 'selected' : ''}`}
-                    onClick={() => setSelectedTime(slot)}
+                    disabled={!availableSlots.includes(slot)}
+                    className={`time-btn ${selectedTime === slot ? 'selected' : ''} ${!availableSlots.includes(slot) ? 'disabled' : ''}`}
+                    onClick={() => availableSlots.includes(slot) && handleSlotClick(slot)}
                   >
                     {slot}
                   </button>
@@ -182,7 +205,11 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
 
         <div className="modal-footer">
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button className="start-btn" onClick={handleStart} disabled={!selectedTime || !selectedDate || (!selectedDoctorId && !selectedPatientId)}>
+          <button
+            className="start-btn"
+            onClick={handleStart}
+            disabled={!selectedTime || !selectedDate || (!selectedDoctorId && !selectedPatientId)}
+          >
             Start Consultation
           </button>
         </div>
