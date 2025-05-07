@@ -7,6 +7,7 @@ import AddPrescriptionModal from "./AddPrescriptionModal";
 import AddSurgeryModal from "./AddSurgeryModal";
 // import { users } from "../data/user";
 import AppointmentsSection from "./AppointmentsSection";
+import Banner from './Banner';
 import TelemedicineModal from "./TelemedicineModal";
 import { ProfileModal } from "./ProfileModal";
 import AllergyModal from "./AllergyModal";
@@ -65,6 +66,7 @@ const DoctorDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [showAppointmentScheduler, setShowAppointmentScheduler] = useState(false);
   const [showTelemedicineModal, setShowTelemedicineModal] = useState(false);
+  const [banner, setBanner] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [allergies, setAllergies] = useState<Allergy[]>([]);
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [surgeries, setSurgeries] = useState<Surgery[]>([]);
@@ -214,6 +216,7 @@ const DoctorDashboard = () => {
   
   const fetchAllergies = async () => {
     try {
+      console.log("inside fetch allergies");
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(`${baseURL}/patients/${patientId}/allergies?page=0&size=3`, {
         headers: {
@@ -297,9 +300,12 @@ const DoctorDashboard = () => {
         body: JSON.stringify(allergy),
       });
   
-      if (!res.ok) throw new Error("Failed to add allergy");
+      if (!res.ok) {
+        throw new Error("Failed to add allergy");
+      }
       else if(res.ok) {
         fetchAllergies();
+        setBanner({ message: 'Data added successfully', type: 'success' });
       }
   
     } catch (err) {
@@ -622,7 +628,15 @@ const DoctorDashboard = () => {
           onAdd={handleAddSurgery}
         />
       )}
-
+      <>
+      {banner && (
+        <Banner
+          message={banner.message}
+          type={banner.type}
+          onClose={() => setBanner(null)}
+        />
+      )}
+    </>
     </div>
   );
 };

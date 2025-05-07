@@ -10,6 +10,8 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordTouched, setPasswordTouched] = useState(false);
+
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("Male");
   const [date, setDate] = useState("");
@@ -23,17 +25,29 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  function formatDateToYYYYMMDD(dateInput: string | Date): string {
+  const formatDateToYYYYMMDD = (dateInput: string | Date): string => {
     const date = new Date(dateInput);
-    if (isNaN(date.getTime())) return ''; // Invalid date
-  
+    if (isNaN(date.getTime())) return '';
     const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0'); // Month is 0-indexed
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
-  
     return `${year}-${month}-${day}`;
-  }
-  
+  };
+
+  const passwordChecks = {
+    minLength: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  };
+
+  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setPasswordTouched(true);
+  };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -91,6 +105,7 @@ const Signup = () => {
         </div>
         <h2>Create a new account</h2>
       </div>
+
       <form onSubmit={handleSignup}>
         <div className="grid-container">
           <div className="input-group">
@@ -103,8 +118,27 @@ const Signup = () => {
           </div>
           <div className="input-group">
             <label>Password *</label>
-            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={handlePasswordChange}
+              onBlur={() => setPasswordTouched(true)}
+            />
+            {passwordTouched && (
+              <div className="password-rules">
+                <p>Password must contain:</p>
+                <ul>
+                  <li className={passwordChecks.minLength ? 'valid' : 'invalid'}>Minimum 8 characters</li>
+                  <li className={passwordChecks.upper ? 'valid' : 'invalid'}>At least one uppercase letter</li>
+                  <li className={passwordChecks.lower ? 'valid' : 'invalid'}>At least one lowercase letter</li>
+                  <li className={passwordChecks.number ? 'valid' : 'invalid'}>At least one number</li>
+                  <li className={passwordChecks.special ? 'valid' : 'invalid'}>At least one special character</li>
+                </ul>
+              </div>
+            )}
           </div>
+
           <div className="input-group">
             <label>Role *</label>
             <select value={signupRole} onChange={(e) => setSignupRole(e.target.value)}>
@@ -161,8 +195,11 @@ const Signup = () => {
             </select>
           </div>
         </div>
-        <button type="submit" className="signup-button">Sign Up</button>
+        <button type="submit" className="signup-button" disabled={!isPasswordValid}>
+          Sign Up
+        </button>
       </form>
+
       <div className="signin-text">
         <p><span className="link" onClick={() => navigate("/")}>Already have an account? Sign in</span></p>
       </div>

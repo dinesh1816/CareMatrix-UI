@@ -31,6 +31,30 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
+
+  .password-rules {
+    margin-top: 8px;
+    font-size: 0.85rem;
+  }
+  
+  .password-rules ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .password-rules li::before {
+    content: "• ";
+    color: #999;
+  }
+  
+  .password-rules li.valid {
+    color: green;
+    font-weight: 500;
+  }
+  
+  .password-rules li.invalid {
+    color: red;
+  }  
   
   .input-group {
     text-align: left;
