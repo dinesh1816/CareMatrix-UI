@@ -300,9 +300,13 @@ const PatientDashboard = () => {
           <div className="card-header">
             <h2 onClick={() => setShowAllergyModal(true)}>Allergies</h2>
           </div>
-          <div className="allergy-list">
+          <div className="allergy-item">
             {allergies.length ? (
-              allergies.map((a, i) => <p key={i}>{a.allergyName}</p>)
+              allergies.map((a, i) => (
+              <p key={i} className="allergy-list">
+                {a.allergyName}
+              </p>
+            ))
             ) : (
               <p className="text-gray-600">No known allergies</p>
             )}
@@ -313,10 +317,10 @@ const PatientDashboard = () => {
           <div className="card-header">
             <h2 onClick={() => setShowConditionModal(true)}>Current Conditions</h2>
           </div>
-          <div className="condition-list">
+          <div className="condition-item">
             {conditions.length ? (
               conditions.map((c, i) => (
-                <p key={i}><strong>{c.conditionName}</strong><br />Diagnosed on: {new Date(c.diagnosedDate).toLocaleDateString()}</p>
+                <p key={i} className="condition-list"><strong>{c.conditionName}</strong><br />Diagnosed on: {new Date(c.diagnosedDate).toLocaleDateString()}</p>
               ))
             ) : (
               <p className="text-gray-600">No existing conditions</p>
@@ -345,10 +349,10 @@ const PatientDashboard = () => {
           <div className="card-header">
             <h2 onClick={() => setShowSurgeryModal(true)}>Surgical History</h2>
           </div>
-          <div className="surgery-list">
+          <div className="surgery-item">
             {surgeries.length ? (
               surgeries.map((c, i) => (
-                <p key={i}><strong>{c.surgeryName}</strong><br />Date: {new Date(c.surgeryDate).toLocaleDateString()}<br />Hospital: {c.surgeryHospital}</p>
+                <p key={i} className="surgery-list"><strong>{c.surgeryName}</strong><br />Date: {new Date(c.surgeryDate).toLocaleDateString()}<br />Hospital: {c.surgeryHospital}</p>
               ))
             ) : (
               <p className="text-gray-600">No Surgeries</p>
@@ -360,13 +364,15 @@ const PatientDashboard = () => {
           <div className="card-header">
             <h2 onClick={() => setShowPrescriptionModal(true)}>Current Prescriptions</h2>
           </div>
-          {latestPrescriptions.length ? (
-            latestPrescriptions.map((p, i) => (
-              <p key={i}><strong>{p.medication}</strong><br />Dosage: {p.dosage}<br />Instructions: {p.instructions}<br />Prescribed on: {new Date(p.prescribedDate).toLocaleDateString()}</p>
-            ))
-          ) : (
-            <p className="text-gray-600">No active prescriptions</p>
-          )}
+          <div>
+            {latestPrescriptions.length ? (
+              latestPrescriptions.map((p, i) => (
+                <p key={i} className="prescription-list"><strong>{p.medication}</strong><br />Dosage: {p.dosage}<br />Instructions: {p.instructions}<br />Prescribed on: {new Date(p.prescribedDate).toLocaleDateString()}</p>
+              ))
+            ) : (
+              <p className="text-gray-600">No active prescriptions</p>
+            )}
+          </div>
         </div>
       </div>
 
