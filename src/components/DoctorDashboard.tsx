@@ -271,7 +271,7 @@ const DoctorDashboard = () => {
   const fetchSurgeries = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/patients/${patientId}/surgeries?page=0&size=3`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/surgical-history?page=0&size=3`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -373,7 +373,7 @@ const DoctorDashboard = () => {
     try {
       const token = localStorage.getItem("jwtToken");
   
-      const res = await fetch(`${baseURL}/patients/${patientId}/surgeries`, {
+      const res = await fetch(`${baseURL}/patients/${patientId}/surgical-history`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
