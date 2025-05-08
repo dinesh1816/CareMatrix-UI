@@ -83,7 +83,8 @@ const DoctorDashboard = () => {
   const [showInsuranceModal, setShowInsuranceModal] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showSurgeryModal, setShowSurgeryModal] = useState(false);
-  const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
+  const [showUpcomingAppointmentsModal, setShowUpcomingAppointmentsModal] = useState(false);
+  const [showPastAppointmentsModal, setShowPastAppointmentsModal] = useState(false);
 
   const [showAddAllergyModal, setShowAddAllergyModal] = useState(false); 
   const [showAddConditionModal, setShowAddConditionModal] = useState(false);
@@ -151,7 +152,6 @@ const DoctorDashboard = () => {
     surgeries: { name: string; date: string; hospital: string }[];
   } | null>(null);
 
-
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
@@ -193,10 +193,10 @@ const DoctorDashboard = () => {
     }
   };
 
-  const fetchDoctorAppointments = async () => {
+  const fetchDoctorPastAppointments = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/appointments/doctor/${localStorage.getItem("userId")}/latest-upcoming`, {
+      const res = await fetch(`${baseURL}/appointments/doctor/${doctorId}?appointmentTimeType=past&page=0&size=2`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -206,8 +206,26 @@ const DoctorDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch appointments");
 
       const data = await res.json();
-      setUpcomingAppointments(data.upcomingAppointments || []);
-      setPastAppointments(data.pastAppointments || []);
+      setPastAppointments(data.content || []);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    }
+  };
+
+  const fetchDoctorUpcomingAppointments = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/appointments/doctor/${doctorId}?appointmentTimeType=upcoming&page=0&size=2`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch appointments");
+
+      const data = await res.json();
+      setUpcomingAppointments(data.content || []);
     } catch (err) {
       console.error("Error fetching appointments:", err);
     }
@@ -437,7 +455,8 @@ const DoctorDashboard = () => {
   }
 
   const fetchDoctorDashboard = () => {
-    fetchDoctorAppointments();
+    fetchDoctorPastAppointments();
+    fetchDoctorUpcomingAppointments();
     fetchDoctorDetails();
   }
 
@@ -465,12 +484,12 @@ const DoctorDashboard = () => {
         </div>
       </div>
       
-      <div onClick={() => setShowAppointmentsModal(true)}>
       <AppointmentsSection
         upcomingAppointments={upcomingAppointments}
         pastAppointments={pastAppointments}
+        onUpcomingClick={() => setShowUpcomingAppointmentsModal(true)}
+        onPastClick={() => setShowPastAppointmentsModal(true)}
       />
-      </div>
 
       <div className="search-container">
         <h3>Patient Search</h3>
@@ -594,42 +613,27 @@ const DoctorDashboard = () => {
       {showInsuranceModal && (<InsuranceModal userId={patientId} onClose={() => setShowInsuranceModal(false)}/>)}
       {showPrescriptionModal && <PrescriptionModal userId={patientId} onClose={() => setShowPrescriptionModal(false)} />}
       {showSurgeryModal && <SurgeryModal userId={patientId} onClose={() => setShowSurgeryModal(false)} />}
-      {showAppointmentsModal && (
+
+      {showUpcomingAppointmentsModal && (
         <AppointmentsModal
-          title="All Appointments"
-          onClose={() => setShowAppointmentsModal(false)}
-          doctorId = {localStorage.getItem("userId")}
-          patientId = {null}
+          title="Upcoming Appointments"
+          onClose={() => setShowUpcomingAppointmentsModal(false)}
+          doctorId={doctorId}
+          patientId={null}
+          appointmentType="upcoming"
         />
       )}
 
-      {showAddAllergyModal && (
-        <AddAllergyModal
-          onClose={() => setShowAddAllergyModal(false)}
-          onAdd={handleAddAllergy}
+      {showPastAppointmentsModal && (
+        <AppointmentsModal
+          title="Past Appointments"
+          onClose={() => setShowPastAppointmentsModal(false)}
+          doctorId={doctorId}
+          patientId={null}
+          appointmentType="past"
         />
       )}
 
-      {showAddConditionModal && (
-        <AddConditionModal
-          onClose={() => setShowAddConditionModal(false)}
-          onAdd={handleAddCondition}
-        />
-      )}
-
-      {showAddPrescriptionModal && (
-        <AddPrescriptionModal
-          onClose={() => setShowAddPrescriptionModal(false)}
-          onAdd={handleAddPrescription}
-        />
-      )}
-
-      {showAddSurgeryModal && (
-        <AddSurgeryModal
-          onClose={() => setShowAddSurgeryModal(false)}
-          onAdd={handleAddSurgery}
-        />
-      )}
       <>
       {banner && (
         <Banner

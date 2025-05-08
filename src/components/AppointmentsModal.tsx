@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 type Appointment = {
   id: number;
   date: string;
+  time: string;
   reason: string;
   status: string;
   doctorName: string;
@@ -19,32 +20,40 @@ interface AppointmentsModalProps {
   onClose: () => void;
   patientId: string | null;
   doctorId: string | null;
+  appointmentType: "upcoming" | "past";
 }
 
 const baseURL = process.env.REACT_APP_API_BASE_URL;
 const ITEMS_PER_PAGE = 5;
-const role = localStorage.getItem("role")
+const role = localStorage.getItem("role");
 
-const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, doctorId, patientId }) => {
+const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ 
+  title, 
+  onClose, 
+  doctorId, 
+  patientId,
+  appointmentType 
+}) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [banner, setBanner] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1); // Track total pages
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchAppointmentData = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
       let res;
+      const endpoint = appointmentType === "upcoming" ? "upcoming" : "past";
 
       if (doctorId != null) {
-        res = await fetch(`${baseURL}/appointments/doctor/${doctorId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
+        res = await fetch(`${baseURL}/appointments/doctor/${doctorId}?appointmentTimeType=${appointmentType}&page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
       } else if (patientId != null) {
-        res = await fetch(`${baseURL}/appointments/patient/${patientId}/paginated?page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
+        res = await fetch(`${baseURL}/appointments/patient/${patientId}?appointmentTimeType=${appointmentType}&page=${currentPage-1}&size=${ITEMS_PER_PAGE}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,8 +66,8 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
       if (!res.ok) throw new Error("Failed to fetch appointments");
 
       const appointmentsList = await res.json();
-      setAppointments(appointmentsList.content); // Set appointment data
-      setTotalPages(appointmentsList.totalPages); // Set total pages
+      setAppointments(appointmentsList.content);
+      setTotalPages(appointmentsList.totalPages);
     } catch (err) {
       console.error("Error fetching appointments:", err);
     }
@@ -66,7 +75,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
   
   useEffect(() => {
     fetchAppointmentData();
-  }, [currentPage, doctorId, patientId]); // Fetch data when page changes
+  }, [currentPage, doctorId, patientId, appointmentType]);
 
   const handlePrev = () => {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
@@ -90,7 +99,6 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
   
       if (res.ok) {
         setBanner({ message: 'Appointment Cancelled successfully', type: 'success' });
-        // Reload the appointments data
         fetchAppointmentData();
       } else {
         const errorText = await res.text();
@@ -102,7 +110,6 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
       setBanner({ message: 'An error occurred while cancelling the appointment', type: 'error' });
     }
   };
-  
 
   return (
     <div className="modal-overlay">
@@ -116,9 +123,10 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           <thead>
             <tr>
               <th>Date</th>
+              <th>Time</th>
               <th>Type</th>
               <th>Meeting Link</th>
-              {role==="doctor" && <th>Actions</th>}
+              {role === "doctor" && appointmentType === "upcoming" && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -126,28 +134,29 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
               appointments.map((a, i) => (
                 <tr key={i}>
                   <td>{new Date(a.date).toLocaleDateString()}</td>
+                  <td>{a.time}</td>
                   <td>
                       {a.type}
                   </td>
                   <td>
-                  {a.meetingLink ? (
-                    <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
-                      Join Meeting
-                    </a>
-                  ) : (
-                    "No link"
+                    {a.meetingLink ? (
+                      <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
+                        Join Meeting
+                      </a>
+                    ) : (
+                      "No link"
+                    )}
+                  </td>
+                  {role === "doctor" && appointmentType === "upcoming" && (
+                    <td>
+                      <button
+                        className="cancel-btn"
+                        onClick={() => handleCancelAppointment(a.id)}
+                      >
+                        Cancel Appointment
+                      </button>
+                    </td>
                   )}
-                  </td>
-                  {localStorage.getItem("role") === "doctor" && (
-                  <td>
-                    <button
-                      className="cancel-btn"
-                      onClick={() => handleCancelAppointment(a.id)}
-                    >
-                      Cancel Appointment
-                    </button>
-                  </td>
-                )}
                 </tr>
               ))
             ) : (
@@ -168,7 +177,6 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           </button>
         </div>
       </div>
-      <>
       {banner && (
         <Banner
           message={banner.message}
@@ -176,7 +184,6 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           onClose={() => setBanner(null)}
         />
       )}
-    </>
     </div>
   );
 };

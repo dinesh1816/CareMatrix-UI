@@ -90,8 +90,8 @@ const PatientDashboard = () => {
   const [showInsuranceModal, setShowInsuranceModal] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [showSurgeryModal, setShowSurgeryModal] = useState(false);
-  const [showAppointmentsModal, setShowAppointmentsModal] = useState(false);
-
+  const [showUpcomingAppointmentsModal, setShowUpcomingAppointmentsModal] = useState(false);
+  const [showPastAppointmentsModal, setShowPastAppointmentsModal] = useState(false);
   const [showAddInsuranceModal, setShowAddInsuranceModal] = useState(false);
 
   const navigate = useNavigate();
@@ -128,10 +128,10 @@ const PatientDashboard = () => {
     }
   };
 
-  const fetchAppointments = async () => {
+  const fetchPatientrPastAppointments = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/appointments/patient/${patientId}/latest-upcoming`, {
+      const res = await fetch(`${baseURL}/appointments/patient/${patientId}?appointmentTimeType=past&page=0&size=2`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -141,8 +141,26 @@ const PatientDashboard = () => {
       if (!res.ok) throw new Error("Failed to fetch appointments");
 
       const data = await res.json();
-      setUpcomingAppointments(data.upcoming || []);
-      setPastAppointments(data.latest || []);
+      setPastAppointments(data.content || []);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    }
+  };
+
+  const fetchPatientUpcomingAppointments = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${baseURL}/appointments/patient/${patientId}?appointmentTimeType=upcoming&page=0&size=2`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch appointments");
+
+      const data = await res.json();
+      setUpcomingAppointments(data.content || []);
     } catch (err) {
       console.error("Error fetching appointments:", err);
     }
@@ -245,7 +263,8 @@ const PatientDashboard = () => {
 
   const fetchDashboardData = async () => {
     fetchPatientProfile();
-    fetchAppointments();
+    fetchPatientrPastAppointments();
+    fetchPatientUpcomingAppointments();
     fetchPatientAllergies();
     fetchPatientInsurance();
     fetchPatientCondition();
@@ -291,9 +310,12 @@ const PatientDashboard = () => {
         </div>
       </div>
 
-      <div onClick={() => setShowAppointmentsModal(true)}>
-        <AppointmentsSection upcomingAppointments={upcomingAppointments} pastAppointments={pastAppointments} />
-      </div>
+      <AppointmentsSection 
+        upcomingAppointments={upcomingAppointments} 
+        pastAppointments={pastAppointments}
+        onUpcomingClick={() => setShowUpcomingAppointmentsModal(true)}
+        onPastClick={() => setShowPastAppointmentsModal(true)}
+      />
 
       <div className="patient-grid-layout">
         <div className="card wide-card">
@@ -379,17 +401,29 @@ const PatientDashboard = () => {
       {showAllergyModal && <AllergyModal userId={patientId} onClose={() => setShowAllergyModal(false)} />}
       {showConditionModal && <ConditionModal userId={patientId} onClose={() => setShowConditionModal(false)} />}
       {showInsuranceModal && (<InsuranceModal userId={patientId} onClose={() => setShowInsuranceModal(false)}/>)}
-
       {showPrescriptionModal && <PrescriptionModal userId={patientId} onClose={() => setShowPrescriptionModal(false)} />}
       {showSurgeryModal && <SurgeryModal userId={patientId} onClose={() => setShowSurgeryModal(false)} />}
-      {showAppointmentsModal && (
+
+      {showUpcomingAppointmentsModal && (
         <AppointmentsModal
-          title="All Appointments"
-          onClose={() => setShowAppointmentsModal(false)}
-          doctorId = {null}
-          patientId = {patientId}
+          title="Upcoming Appointments"
+          onClose={() => setShowUpcomingAppointmentsModal(false)}
+          doctorId={null}
+          patientId={patientId}
+          appointmentType="upcoming"
         />
       )}
+
+      {showPastAppointmentsModal && (
+        <AppointmentsModal
+          title="Past Appointments"
+          onClose={() => setShowPastAppointmentsModal(false)}
+          doctorId={null}
+          patientId={patientId}
+          appointmentType="past"
+        />
+      )}
+
       {showAddInsuranceModal && (
         <AddInsuranceModal
           onClose={() => setShowAddInsuranceModal(false)}

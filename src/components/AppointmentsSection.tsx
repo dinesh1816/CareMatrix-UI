@@ -13,16 +13,20 @@ type Appointment = {
 type Props = {
   upcomingAppointments: Appointment[];
   pastAppointments: Appointment[];
+  onUpcomingClick: () => void;
+  onPastClick: () => void;
 };
 
 const AppointmentsSection: React.FC<Props> = ({
   upcomingAppointments,
   pastAppointments,
+  onUpcomingClick,
+  onPastClick,
 }) => {
   return (
     <div className="appointments-container">
       {/* Upcoming Appointments */}
-      <div className="appointment-box">
+      <div className="appointment-box" onClick={onUpcomingClick}>
         <h2 className="section-title">Upcoming Appointments</h2>
         {upcomingAppointments.length ? (
           upcomingAppointments.map((a) => (
@@ -47,7 +51,7 @@ const AppointmentsSection: React.FC<Props> = ({
                     : "in-person"
                 }`}
               >
-                {a.reason}
+                {a.type}
               </span>
             </div>
           ))
@@ -57,7 +61,7 @@ const AppointmentsSection: React.FC<Props> = ({
       </div>
 
       {/* Past Appointments */}
-      <div className="appointment-box">
+      <div className="appointment-box" onClick={onPastClick}>
         <h2 className="section-title">Past Appointments</h2>
         {pastAppointments.length ? (
           pastAppointments.map((a) => (
@@ -82,7 +86,7 @@ const AppointmentsSection: React.FC<Props> = ({
                     : "in-person"
                 }`}
               >
-                {a.reason}
+                {a.type}
               </span>
             </div>
           ))

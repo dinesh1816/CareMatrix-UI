@@ -15,12 +15,33 @@
     padding: 1.5rem;
     border-radius: 0.75rem;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .appointment-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
   .section-title {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
+    color: #1a56db;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .section-title::after {
+    content: "→";
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .appointment-box:hover .section-title::after {
+    opacity: 1;
   }
   
   .no-appointments {
@@ -34,6 +55,12 @@
     border-radius: 0.5rem;
     margin-bottom: 1rem;
     position: relative;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .appointment-card:hover {
+    border-color: #1a56db;
   }
   
   .patient-name {
@@ -44,6 +71,7 @@
   
   .icon {
     margin-right: 0.3rem;
+    color: #4b5563;
   }
   
   .badge {
