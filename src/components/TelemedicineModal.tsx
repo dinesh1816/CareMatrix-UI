@@ -17,6 +17,12 @@ interface Patient {
   gender: string;
 }
 
+interface TimeSlot {
+  startTime: string;
+  endTime: string;
+  available: boolean;
+}
+
 interface TelemedicineModalProps {
   onClose: () => void;
   role: string | null;
@@ -31,14 +37,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
   const [patients, setPatients] = useState<Patient[]>([]);  
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [selectedPatientId, setSelectedPatientId] = useState('');
-  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
-
-  const timeSlots = [
-    "09:00", "09:30", "10:00",
-    "10:30", "11:00", "11:30",
-    "14:00", "14:30", "15:00",
-    "15:30", "16:00", "16:30",
-  ];
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
 
   const fetchDoctors = async () => {
     try {
@@ -67,23 +66,38 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
   };
 
   const fetchAvailableSlots = async (date: string) => {
-    const formattedDate = new Date(date).toISOString().split("T")[0];
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const userId = localStorage.getItem("userId");
+      const formattedDate = new Date(date).toISOString().split("T")[0];
+      
+      const doctorId = role === 'doctor' ? userId : selectedDoctorId;
+      const patientId = role === 'patient' ? userId : selectedPatientId;
 
-    // Replace with real API when available
-    const mockAvailability: { [key: string]: string[] } = {
-      "2025-05-06": ["09:00", "10:30", "15:00"],
-      "2025-05-07": ["11:00", "14:30", "16:00"],
-    };
+      if (!doctorId || !patientId) {
+        setAvailableSlots([]);
+        return;
+      }
 
-    return new Promise<string[]>((resolve) => {
-      setTimeout(() => {
-        resolve(mockAvailability[formattedDate] || []);
-      }, 300);
-    });
+      const res = await fetch(
+        `${baseURL}/appointments/doctor/${doctorId}/patient/${patientId}/available-slots?date=${formattedDate}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch available slots");
+      
+      const data = await res.json();
+      setAvailableSlots(data);
+    } catch (err) {
+      console.error("Error fetching available slots:", err);
+      setAvailableSlots([]);
+    }
   };
 
-  const handleSlotClick = (slot: string) => {
-    setSelectedTime(slot);
+  const handleSlotClick = (slot: TimeSlot) => {
+    setSelectedTime(slot.startTime);
   };
 
   useEffect(() => {
@@ -92,10 +106,12 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
   }, [role]);
 
   useEffect(() => {
-    if (selectedDate) {
-      fetchAvailableSlots(selectedDate).then(setAvailableSlots);
+    if (selectedDate && ((role === 'doctor' && selectedPatientId) || (role === 'patient' && selectedDoctorId))) {
+      fetchAvailableSlots(selectedDate);
+    } else {
+      setAvailableSlots([]);
     }
-  }, [selectedDate]);
+  }, [selectedDate, selectedDoctorId, selectedPatientId]);
 
   const handleStart = async () => {
     const token = localStorage.getItem("jwtToken");
@@ -103,6 +119,9 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
     const normalizedRole = role?.toLowerCase();
     const [year, month, day] = selectedDate.split("-");
     const formattedDate = `${month}-${day}-${year}`;
+
+    // Format time to HH:mm
+    const formattedTime = selectedTime.split(":")[0] + ":" + selectedTime.split(":")[1];
 
     const query =
       normalizedRole === "doctor"
@@ -118,7 +137,7 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
         },
         body: JSON.stringify({
           date: formattedDate,
-          time: selectedTime,
+          time: formattedTime,
           reason,
           type: "Telemedicine"
         })
@@ -185,14 +204,14 @@ const TelemedicineModal: React.FC<TelemedicineModalProps> = ({ onClose, role }) 
 
               <label>Select Time</label>
               <div className="time-grid">
-                {timeSlots.map((slot, index) => (
+                {availableSlots.map((slot, index) => (
                   <button
                     key={index}
-                    disabled={!availableSlots.includes(slot)}
-                    className={`time-btn ${selectedTime === slot ? 'selected' : ''} ${!availableSlots.includes(slot) ? 'disabled' : ''}`}
-                    onClick={() => availableSlots.includes(slot) && handleSlotClick(slot)}
+                    disabled={!slot.available}
+                    className={`time-btn ${selectedTime === slot.startTime ? 'selected' : ''} ${!slot.available ? 'disabled' : ''}`}
+                    onClick={() => slot.available && handleSlotClick(slot)}
                   >
-                    {slot}
+                    {slot.startTime}
                   </button>
                 ))}
               </div>

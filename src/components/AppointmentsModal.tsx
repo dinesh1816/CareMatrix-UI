@@ -11,6 +11,7 @@ type Appointment = {
   doctorName: string;
   patientName: string | null;
   meetingLink: string | null;
+  type: string;
 };
 
 interface AppointmentsModalProps {
@@ -78,7 +79,9 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
   const handleCancelAppointment = async (appointmentId: number) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/appointments/${appointmentId}/cancel`, {
+      const doctorId = localStorage.getItem("userId");
+      
+      const res = await fetch(`${baseURL}/appointments/${appointmentId}/cancel?doctorId=${doctorId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -86,14 +89,17 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
       });
   
       if (res.ok) {
-        fetchAppointmentData();
         setBanner({ message: 'Appointment Cancelled successfully', type: 'success' });
+        // Reload the appointments data
+        fetchAppointmentData();
       } else {
-        console.error("Failed to cancel appointment.");
+        const errorText = await res.text();
+        console.error("Failed to cancel appointment:", errorText);
         setBanner({ message: 'Failed to cancel appointment', type: 'error' });
       }
     } catch (err) {
       console.error("Error cancelling appointment:", err);
+      setBanner({ message: 'An error occurred while cancelling the appointment', type: 'error' });
     }
   };
   
@@ -110,6 +116,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
           <thead>
             <tr>
               <th>Date</th>
+              <th>Type</th>
               <th>Meeting Link</th>
               {role==="doctor" && <th>Actions</th>}
             </tr>
@@ -119,6 +126,9 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({ title, onClose, d
               appointments.map((a, i) => (
                 <tr key={i}>
                   <td>{new Date(a.date).toLocaleDateString()}</td>
+                  <td>
+                      {a.type}
+                  </td>
                   <td>
                   {a.meetingLink ? (
                     <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
