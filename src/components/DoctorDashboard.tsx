@@ -59,7 +59,7 @@ type Insurance = {
 type Surgery = {
   surgeryName: string;
   surgeryDate: string;
-  surgeryHospital: string;
+  hospital: string;
 };
 
 const DoctorDashboard = () => {
@@ -155,16 +155,30 @@ const DoctorDashboard = () => {
   const handleSearch = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseURL}/doctors/patients/${searchId}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include"
-      });
-  
+      let res: Response | undefined;
+
+      if (searchId) {
+        res = await fetch(`${baseURL}/doctors/patients/${searchId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include"
+        });
+      } else if (searchDob && searchName) {
+        res = await fetch(`${baseURL}/doctors/patients/search/by-name-dob?name=${searchName}&dateOfBirth=${searchDob}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include"
+        });
+        console.log(res);
+      }
+
+      if (!res) throw new Error("No search criteria provided");
       if (!res.ok) throw new Error("Failed to fetch patient details");
-  
+
       const data = await res.json(); // ✅ Parse response
       console.log("inside handle search");
       // ✅ Now assign values from `data`
@@ -185,7 +199,6 @@ const DoctorDashboard = () => {
       setLatestPrescriptions(data.currentPrescriptions.slice(0,3));
       setSurgeries(data.surgeries.slice(0,3));
       setLatestInsurance(data.insuranceInformations?.[0] || null); // If array
-      
       setGotSearchData(true);
       console.log("patient data", patientName, allergies);
     } catch (error) {
@@ -495,7 +508,7 @@ const DoctorDashboard = () => {
         <h3>Patient Search</h3>
         <div className="search-box">
           <input type="text" placeholder="Enter patient name" onChange={(e) => setSearchName(e.target.value)} />
-          <input type="text" placeholder="mm/dd/yyyy" onChange={(e) => setSearchDob(e.target.value)}/>
+          <input type="text" placeholder="yyyy-mm-dd" onChange={(e) => setSearchDob(e.target.value)}/>
           <input
             type="text"
             placeholder="Enter patient ID"
@@ -600,7 +613,7 @@ const DoctorDashboard = () => {
                   <br />
                   Date: {surgery.surgeryDate}
                   <br />
-                  Hospital: {surgery.surgeryHospital}
+                  Hospital: {surgery.hospital}
                 </p>
               ))}
             </div>
@@ -613,6 +626,31 @@ const DoctorDashboard = () => {
       {showInsuranceModal && (<InsuranceModal userId={patientId} onClose={() => setShowInsuranceModal(false)}/>)}
       {showPrescriptionModal && <PrescriptionModal userId={patientId} onClose={() => setShowPrescriptionModal(false)} />}
       {showSurgeryModal && <SurgeryModal userId={patientId} onClose={() => setShowSurgeryModal(false)} />}
+
+      {showAddAllergyModal && (
+        <AddAllergyModal
+          onClose={() => setShowAddAllergyModal(false)}
+          onAdd={handleAddAllergy}
+        />
+      )}
+      {showAddConditionModal && (
+        <AddConditionModal
+          onClose={() => setShowAddConditionModal(false)}
+          onAdd={handleAddCondition}
+        />
+      )}
+      {showAddPrescriptionModal && (
+        <AddPrescriptionModal
+          onClose={() => setShowAddPrescriptionModal(false)}
+          onAdd={handleAddPrescription}
+        />
+      )}
+      {showAddSurgeryModal && (
+        <AddSurgeryModal
+          onClose={() => setShowAddSurgeryModal(false)}
+          onAdd={handleAddSurgery}
+        />
+      )}
 
       {showUpcomingAppointmentsModal && (
         <AppointmentsModal

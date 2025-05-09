@@ -26,11 +26,17 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const formatDateToYYYYMMDD = (dateInput: string | Date): string => {
+    if (typeof dateInput === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+      // Already in correct format from <input type="date" />
+      console.log("the return value is", dateInput);
+      return dateInput;
+    }
     const date = new Date(dateInput);
-    if (isNaN(date.getTime())) return '';
+    // if (isNaN(date.getTime())) return "";
     const year = date.getFullYear();
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
+    console.log("the return value is", `${year}-${month}-${day}`);
     return `${year}-${month}-${day}`;
   };
 
@@ -76,6 +82,7 @@ const Signup = () => {
         department: "",
         education: ""
       };
+      console.log("the formatted DOB is", formatDateToYYYYMMDD(date));
       const response = await fetch(signupURL, {
         method: "POST",
         headers: {
