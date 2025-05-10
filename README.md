@@ -35,9 +35,14 @@ CareMatrix is a modern healthcare management system that connects patients and d
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-- Git
+- Node.js (v18.17.0 or higher recommended)
+  - You can check your Node.js version using `node --version`
+  - For optimal performance and compatibility, use Node.js LTS version
+- npm (v9.6.7 or higher)
+  - You can check your npm version using `npm --version`
+- Git (latest version)
+
+> **Note**: This project has been tested with Node.js v18.17.0 and npm v9.6.7. While it may work with other versions, we recommend using these specific versions to avoid any compatibility issues.
 
 ## Setup Instructions
 
