@@ -21,11 +21,13 @@ type User = {
 type ProfileModalProps = {
   user: User;
   onClose: () => void;
+  onProfileUpdate?: () => void;
 };
 
-export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => {
+export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose, onProfileUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<User>(user);
+  const role = localStorage.getItem("role");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,9 +42,50 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ user, onClose }) => 
     setIsEditing(false);
   };
 
-  const handleSave = () => {
-    console.log("Updated Profile:", formData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const userId = localStorage.getItem("userId");
+      
+      if (!userId) {
+        console.error("No user ID found");
+        return;
+      }
+      let response;
+      if (role === "patient") {
+        response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/patients/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+      } else {
+        response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/doctors/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      // Update successful
+      setIsEditing(false);
+      // Call the callback to refresh profile data
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   return (

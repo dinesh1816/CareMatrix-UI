@@ -53,7 +53,7 @@ type Insurance = {
 type Surgery = {
   surgeryName: string;
   surgeryDate: string;
-  surgeryHospital: string;
+  hospital: string;
 };
 
 type PatientProfile = {
@@ -196,9 +196,8 @@ const PatientDashboard = () => {
       });
 
       if (!res.ok) throw new Error("Failed to fetch insurance");
-
       const data = await res.json();
-      setLatestInsurance(data[0] || null);
+      setLatestInsurance(data.content?.[0] || null);
     } catch (err) {
       console.error("Error fetching insurance:", err);
     }
@@ -299,13 +298,41 @@ const PatientDashboard = () => {
     }
   };
 
+  const refreshProfile = async () => {
+    try {
+      const token = localStorage.getItem("jwtToken");
+      const userId = localStorage.getItem("userId");
+      
+      if (!userId) return;
+
+      const response = await fetch(`${baseURL}/patients/get/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch profile");
+      
+      const data = await response.json();
+      setPatientProfile(data);
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <div className="top-bar">
         <h1>Welcome, {patientProfile?.name || "Patient"}</h1>
         <div className="icons">
           <UserCircle2 className="icon" onClick={() => setShowProfile(!showProfile)} />
-          {showProfile && patientProfile && <ProfileModal user={patientProfile} onClose={() => setShowProfile(false)} />}
+          {showProfile && patientProfile && (
+            <ProfileModal 
+              user={patientProfile} 
+              onClose={() => setShowProfile(false)} 
+              onProfileUpdate={refreshProfile}
+            />
+          )}
           <LogOut className="icon" onClick={handleLogout} />
         </div>
       </div>
@@ -374,7 +401,7 @@ const PatientDashboard = () => {
           <div className="surgery-item">
             {surgeries.length ? (
               surgeries.map((c, i) => (
-                <p key={i} className="surgery-list"><strong>{c.surgeryName}</strong><br />Date: {new Date(c.surgeryDate).toLocaleDateString()}<br />Hospital: {c.surgeryHospital}</p>
+                <p key={i} className="surgery-list"><strong>{c.surgeryName}</strong><br />Date: {new Date(c.surgeryDate).toLocaleDateString()}<br />Hospital: {c.hospital}</p>
               ))
             ) : (
               <p className="text-gray-600">No Surgeries</p>

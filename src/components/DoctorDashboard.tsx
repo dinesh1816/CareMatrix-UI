@@ -509,6 +509,7 @@ const DoctorDashboard = () => {
         <div className="search-box">
           <input type="text" placeholder="Enter patient name" onChange={(e) => setSearchName(e.target.value)} />
           <input type="text" placeholder="yyyy-mm-dd" onChange={(e) => setSearchDob(e.target.value)}/>
+          <p>or</p>
           <input
             type="text"
             placeholder="Enter patient ID"
