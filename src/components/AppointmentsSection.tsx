@@ -38,10 +38,7 @@ const AppointmentsSection: React.FC<Props> = ({
               </p>
               <p>
                 <Clock className="icon" size={16} />
-                {new Date(a.date).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {a.time}
               </p>
               <p>{a.reason}</p>
               <span
@@ -73,10 +70,7 @@ const AppointmentsSection: React.FC<Props> = ({
               </p>
               <p>
                 <Clock className="icon" size={16} />
-                {new Date(a.date).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {a.time}
               </p>
               <p>{a.reason}</p>
               <span

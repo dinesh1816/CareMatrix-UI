@@ -125,7 +125,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({
               <th>Date</th>
               <th>Time</th>
               <th>Type</th>
-              <th>Meeting Link</th>
+              {appointmentType === "upcoming" && <th>Meeting Link</th>}
               {role === "doctor" && appointmentType === "upcoming" && <th>Actions</th>}
             </tr>
           </thead>
@@ -138,15 +138,17 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({
                   <td>
                       {a.type}
                   </td>
-                  <td>
-                    {a.meetingLink ? (
-                      <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
-                        Join Meeting
-                      </a>
-                    ) : (
-                      "No link"
-                    )}
-                  </td>
+                  {appointmentType === "upcoming" && (
+                    <td>
+                      {a.meetingLink ? (
+                        <a href={a.meetingLink} target="_blank" rel="noopener noreferrer">
+                          Join Meeting
+                        </a>
+                      ) : (
+                        "No link"
+                      )}
+                    </td>
+                  )}
                   {role === "doctor" && appointmentType === "upcoming" && (
                     <td>
                       <button
@@ -161,7 +163,7 @@ const AppointmentsModal: React.FC<AppointmentsModalProps> = ({
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center">No appointments found.</td>
+                <td colSpan={appointmentType === "upcoming" ? 6 : 4} className="text-center">No appointments found.</td>
               </tr>
             )}
           </tbody>
